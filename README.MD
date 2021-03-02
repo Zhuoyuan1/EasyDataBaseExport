@@ -9,3 +9,14 @@
 * 2.支持查看表信息展示
 * 3.支持表字段展示
 * 4.支持excel、word导出
+
+## 功能速览
+> 注：图中涉及资源均来源于网络，仅用于展示工具功能，版权归其作者所有。
+
++ 连接
+
+![UploadFile](https://github.com/Zhuoyuan1/MySQLToWordOrExcel/blob/main/image/login.jpg?raw=true)
+
++ 主页基本功能展示
+
+![MainPage](https://github.com/Zhuoyuan1/MySQLToWordOrExcel/blob/main/image/home.jpg?raw=true)
