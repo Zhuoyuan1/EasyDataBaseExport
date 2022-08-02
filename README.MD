@@ -1,5 +1,5 @@
 <div align="center">
-   <img alt="EasyDataBaseExport" src="https://gitee.com/lzy549876/EasyDataBaseExport/raw/main/image/logo.png">
+   <img alt="EasyDataBaseExport" src="https://github.com/Zhuoyuan1/MySQLToWordOrExcel/blob/main/image/logo.png">
    <a href="https://www.likethewind.top">
       <h1 align="center" style="color:#4da7fd">
          <b>EasyDataBaseExport</b>
@@ -46,11 +46,11 @@
 
 + 连接
 
-![在这里插入图片描述](https://github.com/Zhuoyuan1/MySQLToWordOrExcel/blob/main/image/login.jpg?raw=true)
+![在这里插入图片描述](https://github.com/Zhuoyuan1/MySQLToWordOrExcel/blob/main/image/login.jpg)
 
 + 主页基本功能展示
 
-![在这里插入图片描述](https://gitee.com/lzy549876/EasyDataBaseExport/raw/main/image/home.jpg)
+![在这里插入图片描述](https://github.com/Zhuoyuan1/MySQLToWordOrExcel/blob/main/image/home.jpg)
 
 #### 导出自定义
 
@@ -85,12 +85,12 @@ EasyDataBaseExport
 * 3.运行`EasyDataBaseExportMain`的main方法
 
 ### 编译和打包  
-![img.png](https://gitee.com/lzy549876/EasyDataBaseExport/raw/main/image/maven.png)  
+![img.png](https://github.com/Zhuoyuan1/MySQLToWordOrExcel/blob/main/image/maven.png)  
 双击运行`assembly:assembly`进行打包
 
 注：由于采用的部分驱动未上传maven仓库  
 若打包报错，提示找不到包，请先运行 `mvn install`  
-![img.png](https://gitee.com/lzy549876/EasyDataBaseExport/raw/main/image/install.png)
+![img.png](https://github.com/Zhuoyuan1/MySQLToWordOrExcel/blob/main/image/install.png)
 ### 下载  
 
 蓝奏云：[https://wwr.lanzoui.com/b02c7c0cb](https://wwr.lanzoui.com/b02c7c0cb) 密码:1111  
