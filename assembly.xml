@@ -1,0 +1,31 @@
+<assembly>
+    <id>jar-with-dependencies</id><!-- 配置文件的标识，同时生成的jar包名字会把这个文本包含进去 -->
+    <formats>
+        <format>jar</format><!-- 打包类型，此处为jar -->
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <dependencySets>
+        <dependencySet>
+            <unpack>true</unpack><!-- 是否解压 -->
+            <scope>system</scope>
+            <!-- 将项目所有依赖包拷贝到发布包的lib目录下 ：-->
+            <outputDirectory>/</outputDirectory>
+            <!--是否把本项目添加到依赖文件夹下:-->
+            <useProjectArtifact>false</useProjectArtifact>
+        </dependencySet>
+        <dependencySet>
+            <unpack>true</unpack><!-- 是否解压 -->
+            <!-- 是否把当前项目的输出jar包并使用，true则会把当前项目输出为jar包到输出目录,false不输出 -->
+            <useProjectArtifact>false</useProjectArtifact>
+            <scope>runtime</scope>
+            <!-- 依赖输出目录，相对输出目录的根目录，当前示例把依赖输出到lib目录 -->
+            <outputDirectory>/</outputDirectory>
+        </dependencySet>
+    </dependencySets>
+    <fileSets>
+        <fileSet>
+            <directory>${project.build.outputDirectory}</directory>
+            <outputDirectory>/</outputDirectory>
+        </fileSet>
+    </fileSets>
+</assembly>

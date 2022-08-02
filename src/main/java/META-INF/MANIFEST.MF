@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Main-Class: com.easydatabaseexport.EasyDataBaseExportMain
+Class-Path: lombok-1.18.6.jar lite-2.2.3.jar commons-codec-1.9.jar stax-
+ api-1.0.1.jar protobuf-java-3.6.1.jar poi-3.11-beta2.jar poi-ooxml-3.11
+ -beta2.jar laf-widget-5.0.jar x86-3.3.0-v3346.jar trident-1.2.jar laf-p
+ lugin-1.1.jar xmlbeans-2.6.0.jar poi-ooxml-schemas-3.11-beta2.jar subst
+ ance-6.0.jar mysql-connector-java-8.0.15.jar
+
