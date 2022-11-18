@@ -11,94 +11,137 @@
     <img alt="IntelliJ IDEA 2021" src="https://img.shields.io/badge/IntelliJ IDEA-2021-blue.svg">
     <img alt="java" src="https://img.shields.io/badge/language-java-brightgreen.svg">
     <img src="https://img.shields.io/badge/JDK-1.8.0_151+-yellow.svg" alt="JDK Version">
-    <img alt="release" src="https://img.shields.io/badge/release-0.1.1-green">
+    <img alt="release" src="https://img.shields.io/badge/release-0.1.3-green">
+    <img alt="license" src="https://img.shields.io/badge/license-MIT-blue.svg">
 </p> 
 
-## 表结构导出Excel、导出Word
-该工具主要用于导出excel、word，方便快速生成《数据库结构文档》，同时可以快速查看表的结构和相关信息  
-该工具永久免费，欢迎大家体验！  
-下载地址：右侧【发行版】中下载最新版   
-其他历史版本：[下载](https://wwr.lanzoui.com/b02c7c0cb) 【密码:1111】
+English | [简体中文](https://github.com/Zhuoyuan1/MySQLToWordOrExcel/blob/main/README_zh.MD)
 
-### 使用手册  
-[《EasyDataBaseExport说明文档》](https://www.likethewind.top/)
+## Table structure export
+This tool is mainly used to export the table structure to facilitate the quick generation of the 《 Document of Database Structure》, and to quickly view the table structure and related information.  
+The tool is free forever, welcome to experience!  
+Download address: [here](https://www.likethewind.top/)  
+Other versions: [download](https://wwr.lanzoui.com/b02c7c0cb) 【password:1111】
 
-### 运行环境要求  
- *  1.8.0_151+ （建议最好1.8.0_151以上的版本，因为151版本为JVM启用无限制强度管辖策略）
+### 📖 Documentation   
+[《Documentation of EasyDataBaseExport》](https://www.likethewind.top/)
 
-### 数据库支持  
+### 💬  Runtime environment requirements
+
+* 1.8.0_151+ （Recommended jdk_1.8.0_151, the unlimited strength governance policy is enabled for the JVM）
+
+### 🔍 Database support
+
 - &#10004; MySQL
 - &#10004; Oracle
 - &#10004; SqlServer
 - &#10004; PostgreSQL
-- &#10004; 达梦
-- &#10004; 人大金仓
+- &#10004; DM
+- &#10004; KINGBASE8
 - &#10004; DB2
+- &#10004; XUGU ![在这里插入图片描述](https://github.com/Zhuoyuan1/MySQLToWordOrExcel/blob/main/image/new2.gif)
 
+### 📑 Document support
 
-### 文档支持  
 - &#10004; Word
 - &#10004; Excel
+- &#10004; Markdown ![在这里插入图片描述](https://github.com/Zhuoyuan1/MySQLToWordOrExcel/blob/main/image/new2.gif)
+- &#10004; Html ![在这里插入图片描述](https://github.com/Zhuoyuan1/MySQLToWordOrExcel/blob/main/image/new2.gif)
+- &#10004; Pdf ![在这里插入图片描述](https://github.com/Zhuoyuan1/MySQLToWordOrExcel/blob/main/image/new2.gif)
 
+### 👀 Function overview
 
-### 功能速览
-> 注：图中涉及资源均来源于网络，仅用于展示工具功能，版权归其作者所有。
+> Tips：The resources mentioned in the figure are all from the network and are only used to show the tool functions. The copyright belongs to the author.  
 
-+ 连接
++ Connect Page
 
 ![在这里插入图片描述](https://github.com/Zhuoyuan1/MySQLToWordOrExcel/blob/main/image/login.jpg)
 
-+ 主页基本功能展示
++ Functions of Homepage
 
 ![在这里插入图片描述](https://github.com/Zhuoyuan1/MySQLToWordOrExcel/blob/main/image/home.jpg)
 
-#### 导出自定义
++ Export Custom
 
-> `Word`可以导出表的 `主键`和`索引`  
-> `Excel`可以导出分 `单sheet`和`多sheet`
+> `Word`、`Markdown`、`Html` and `Pdf` can export the `Primary-keys` and `Indexes` of table  
+> `Excel` can export `Single sheet` or `More sheet`
 
-配置位置如下：
+
+The configuration location is as follows:    
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/8f7ecf0270fc46d69fad54fc4c3a9956.gif)
 
-### 项目结构  
++ Word
+
+![在这里插入图片描述](https://github.com/Zhuoyuan1/MySQLToWordOrExcel/blob/main/image/Word.png)
+
++ Excel
+
+![在这里插入图片描述](https://github.com/Zhuoyuan1/MySQLToWordOrExcel/blob/main/image/Excel.png)
+
+More sheet
+![在这里插入图片描述](https://github.com/Zhuoyuan1/MySQLToWordOrExcel/blob/main/image/Excel_sheet.png)
+
++ Markdown
+
+![在这里插入图片描述](https://github.com/Zhuoyuan1/MySQLToWordOrExcel/blob/main/image/Markdown.png)
+
++ Html
+
+![在这里插入图片描述](https://github.com/Zhuoyuan1/MySQLToWordOrExcel/blob/main/image/Html.png)
+
++ Pdf
+
+![在这里插入图片描述](https://github.com/Zhuoyuan1/MySQLToWordOrExcel/blob/main/image/Pdf.png)
+
+
+### ☕ Project structure
 
 ```md
 EasyDataBaseExport
 └─ src/main/java/com/easydatabaseexport
-    ├── `common` _(**公共信息**)_
-    ├── `core` _(**核心包，包含核心数据源和接口**)_
-    ├── `database` _(**所有数据库的数据源和实现**)_
-    ├── `entities` _(**实体**)_
-    ├── `enums` _(**枚举**)_
-    ├── `exception` _(**全局异常**)_
-    ├── `factory` _(**工厂**)_
-    ├── `log` _(**全局异常拦截日志**)_
-    ├── `navicat` _(**navicat处理**)_
-    ├── `ui` _(**界面**)_
-    └── `util` _(**工具**)_
+    ├── `common`   
+    ├── `core`  
+    ├── `database`  
+    ├── `entities` 
+    ├── `enums`  
+    ├── `exception`
+    ├── `factory`
+    ├── `log`   
+    ├── `navicat`
+    ├── `ui` 
+    └── `util`
 ```
 
-### 运行方式  
+### 🏃 How to run
 
-* 1.双击
-* 2.java -jar *.jar
-* 3.运行`EasyDataBaseExportMain`的main方法
+* 1.Double-click jar
+* 2.Command line input : java -jar *.jar
+* 3.Run `EasyDataBaseExportMain` main-method
 
-### 编译和打包  
+### 📦 Compile and package
+
 ![img.png](https://github.com/Zhuoyuan1/MySQLToWordOrExcel/blob/main/image/maven.png)  
-双击运行`assembly:assembly`进行打包
+Double click to run `assembly:assembly` to package
 
-注：由于采用的部分驱动未上传maven仓库  
-若打包报错，提示找不到包，请先运行 `mvn install`  
+Note: Some adopted drivers are not uploaded to Maven warehouse  
+If the packaging error is reported, you will be prompted that the package cannot be found. Please run `mvn install`  
 ![img.png](https://github.com/Zhuoyuan1/MySQLToWordOrExcel/blob/main/image/install.png)
-### 下载  
 
-蓝奏云：[https://wwr.lanzoui.com/b02c7c0cb](https://wwr.lanzoui.com/b02c7c0cb) 密码:1111  
-项目地址：[https://gitee.com/lzy549876/EasyDataBaseExport](https://gitee.com/lzy549876/EasyDataBaseExport)
+### ⏳ Download
 
-> 做这个工具的初衷是为了方便导出数据结构到word、excel。开发不易，希望多多支持，帮忙点star，谢谢各位！！！
+Lan zou yun：[https://wwr.lanzoui.com/b02c7c0cb](https://wwr.lanzoui.com/b02c7c0cb) password:1111  
+Project：[https://gitee.com/lzy549876/EasyDataBaseExport](https://gitee.com/lzy549876/EasyDataBaseExport)
 
-### 联系方式    
+### 📧 Contact me
 
 QQ: 963565242       
 Mail: 963565242@qq.com
+
+### 📌 Jetbrains plug-in
+
+This plug-in is applicable to multiple JetBrains platforms (including but not limited to IntelliJ IDEA and PyCharm). It is developed based on the Database Tool, and all databases supported by the Database Tool are supported.  
+It implements the core functions of this tool. Welcome to try!💖
+![输入图片说明](image/image.png)  
+Plug-in download address:      
+[https://plugins.jetbrains.com/plugin/19672-easy-database-export](https://plugins.jetbrains.com/plugin/19672-easy-database-export)
+> If this tool can help you, please click star, Thank you!!!

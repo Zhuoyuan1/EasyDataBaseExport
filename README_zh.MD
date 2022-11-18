@@ -15,9 +15,10 @@
     <img alt="license" src="https://img.shields.io/badge/license-MIT-blue.svg">
 </p> 
 
-## 表结构
+[English](https://github.com/Zhuoyuan1/MySQLToWordOrExcel) | 简体中文
 
-该工具主要用于导出excel、word，方便快速生成《数据库结构文档》，同时可以快速查看表的结构和相关信息  
+## 表结构导出
+该工具主要用于导出表结构，方便快速生成《数据库结构文档》，同时可以快速查看表的结构和相关信息  
 该工具永久免费，欢迎大家体验！  
 下载地址：右侧【发行版】中下载最新版   
 其他历史版本：[下载](https://wwr.lanzoui.com/b02c7c0cb) 【密码:1111】
