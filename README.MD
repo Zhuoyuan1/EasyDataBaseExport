@@ -141,7 +141,7 @@ Mail: 963565242@qq.com
 
 This plug-in is applicable to multiple JetBrains platforms (including but not limited to IntelliJ IDEA and PyCharm). It is developed based on the Database Tool, and all databases supported by the Database Tool are supported.  
 It implements the core functions of this tool. Welcome to try!💖
-![输入图片说明](image/image.png)  
+![输入图片说明](https://github.com/Zhuoyuan1/MySQLToWordOrExcel/blob/main/image/image.png)  
 Plug-in download address:      
 [https://plugins.jetbrains.com/plugin/19672-easy-database-export](https://plugins.jetbrains.com/plugin/19672-easy-database-export)
 > If this tool can help you, please click star, Thank you!!!

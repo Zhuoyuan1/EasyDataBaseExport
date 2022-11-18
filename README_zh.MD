@@ -141,7 +141,7 @@ Mail: 963565242@qq.com
 
 本插件适用于多个Jetbrains平台（包括但不限于IntelliJ IDEA、PyCharm），基于Database Tool开发，所有Database Tool支持的数据库都是支持的。  
 它实现了本工具的核心功能，欢迎试用！💖
-![输入图片说明](image/image.png)
+![输入图片说明](https://github.com/Zhuoyuan1/MySQLToWordOrExcel/blob/main/image/image.png)
 插件下载地址    
 [https://plugins.jetbrains.com/plugin/19672-easy-database-export](https://plugins.jetbrains.com/plugin/19672-easy-database-export)
 > 欢迎下载使用，开发不易，希望多多支持，帮忙点star，谢谢各位！！！
