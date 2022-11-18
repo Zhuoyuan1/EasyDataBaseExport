@@ -144,4 +144,4 @@ It implements the core functions of this tool. Welcome to try!💖
 ![输入图片说明](https://github.com/Zhuoyuan1/MySQLToWordOrExcel/blob/main/image/image.png)  
 Plug-in download address:      
 [https://plugins.jetbrains.com/plugin/19672-easy-database-export](https://plugins.jetbrains.com/plugin/19672-easy-database-export)
-> If this tool can help you, please click star, Thank you!!!
+> If this tool can help you, please click star. Thank you!!!
