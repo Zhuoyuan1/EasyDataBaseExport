@@ -103,7 +103,7 @@ public class MySqlDataResultImpl extends AbstractDataResultImpl implements DataR
         return scroll;
     }
 
-    private static String sql = "SELECT COLUMN_NAME,COLUMN_TYPE,DATA_TYPE,CHARACTER_MAXIMUM_LENGTH as LENGTH, " +
+    private static final String sql = "SELECT COLUMN_NAME,COLUMN_TYPE,DATA_TYPE,CHARACTER_MAXIMUM_LENGTH as LENGTH, " +
             "IS_NULLABLE,COLUMN_DEFAULT,NUMERIC_SCALE as decimal_places,COLUMN_COMMENT " +
             "FROM INFORMATION_SCHEMA.COLUMNS " +
             "where table_schema = '?' AND table_name  = '?' order by ORDINAL_POSITION";
@@ -334,7 +334,10 @@ public class MySqlDataResultImpl extends AbstractDataResultImpl implements DataR
         list.forEach(v -> {
             v.setTableName(StringUtil.StringEqual(v.getTableName()) + "[" + StringUtil.StringEqual(v.getTableComment()) + "]");
         });
-        CommonDataBaseType.CON_DATABASE_TABLE_MAP = list.parallelStream().collect(Collectors.groupingBy(TableType::getTableSchema));
+        CommonDataBaseType.CON_DATABASE_TABLE_MAP = list.parallelStream().collect(Collectors.groupingBy(TableType::getTableSchema, HashMap::new,
+                Collectors.collectingAndThen(Collectors.toList(),
+                        v -> v.stream().sorted(Comparator.comparing(TableType::getTableName)).collect(Collectors.toList())
+                )));
     }
 
     /**

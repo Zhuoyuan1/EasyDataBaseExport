@@ -5,6 +5,7 @@ import com.easydatabaseexport.common.EnvironmentConstant;
 import com.easydatabaseexport.enums.UpdateEnum;
 import com.easydatabaseexport.enums.YesNoEnum;
 import com.easydatabaseexport.ui.UpdateVersionFrame;
+import com.microsoft.sqlserver.jdbc.StringUtils;
 
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -24,7 +25,11 @@ public class CheckUpdateUtil {
      **/
     public static void check() {
         //判断软件更新逻辑
-        if (!EnvironmentConstant.FILE_MD5_VALUE.equals(FileOperateUtil.getRemoteFileMD5())) {
+        String result = FileOperateUtil.getRemoteFileMD5();
+        if (StringUtils.isEmpty(result)) {
+            return;
+        }
+        if (!EnvironmentConstant.FILE_MD5_VALUE.equals(result)) {
             if (!CommonConstant.configMap.containsKey(UpdateEnum.UPDATE_VERSION.getKey())) {
                 UpdateVersionFrame updateVersion = new UpdateVersionFrame();
                 updateVersion.updateVersionFrame();
@@ -42,11 +47,15 @@ public class CheckUpdateUtil {
      **/
     public static void checkByClick() {
         //判断软件更新逻辑
-        if (!EnvironmentConstant.FILE_MD5_VALUE.equals(FileOperateUtil.getRemoteFileMD5())) {
+        String result = FileOperateUtil.getRemoteFileMD5();
+        if (StringUtils.isEmpty(result)) {
+            return;
+        }
+        if (!EnvironmentConstant.FILE_MD5_VALUE.equals(result)) {
             UpdateVersionFrame updateVersion = new UpdateVersionFrame();
             updateVersion.updateVersionFrame();
         } else {
-            URL url = CheckUpdateUtil.class.getResource("/success.png");
+            URL url = CheckUpdateUtil.class.getResource("/images/success.png");
             ImageIcon success = new ImageIcon(Objects.requireNonNull(url));
             JOptionPane.showMessageDialog(null, "您当前使用的是最新版本", "", JOptionPane.PLAIN_MESSAGE, success);
         }

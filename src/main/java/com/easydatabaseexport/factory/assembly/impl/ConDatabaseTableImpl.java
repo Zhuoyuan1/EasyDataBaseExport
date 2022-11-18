@@ -23,9 +23,9 @@ public class ConDatabaseTableImpl implements DataBaseAssembly {
     @Override
     public List<ImageIcon> image() {
         List<ImageIcon> list = new ArrayList<>(3);
-        list.add(new ImageIcon(ConDatabaseModeTableImpl.class.getResource("/" + CommonConstant.DATA_BASE_TYPE.toLowerCase() + ".png")));
-        list.add(new ImageIcon(ConDatabaseModeTableImpl.class.getResource("/database.png")));
-        list.add(new ImageIcon(ConDatabaseModeTableImpl.class.getResource("/table.png")));
+        list.add(new ImageIcon(ConDatabaseModeTableImpl.class.getResource("/images/" + CommonConstant.DATA_BASE_TYPE.toLowerCase() + ".png")));
+        list.add(new ImageIcon(ConDatabaseModeTableImpl.class.getResource("/images/database.png")));
+        list.add(new ImageIcon(ConDatabaseModeTableImpl.class.getResource("/images/table.png")));
         return list;
     }
 

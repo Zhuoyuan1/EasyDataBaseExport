@@ -14,7 +14,7 @@ public enum YesNoEnum {
     private final String value;
     private final String label;
 
-    private YesNoEnum(String value, String label) {
+    YesNoEnum(String value, String label) {
         this.value = value;
         this.label = label;
     }

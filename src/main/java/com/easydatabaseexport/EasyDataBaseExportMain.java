@@ -29,8 +29,6 @@ public class EasyDataBaseExportMain {
             CommonConstant.checkConfigIniFile();
             //生成模板文件
             CommonConstant.copyTemplateFile();
-            //安装主题
-            //UIManager.setInstalledLookAndFeels(CommonConstant.THEMES);
         } catch (Exception e) {
             LogManager.writeLogFile(e, log);
         }

@@ -5,29 +5,8 @@ import com.easydatabaseexport.entities.TableParameter;
 import com.easydatabaseexport.log.LogManager;
 import com.mysql.cj.util.StringUtils;
 import lombok.extern.java.Log;
-import org.apache.poi.xwpf.usermodel.IBody;
-import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
-import org.apache.poi.xwpf.usermodel.XWPFDocument;
-import org.apache.poi.xwpf.usermodel.XWPFParagraph;
-import org.apache.poi.xwpf.usermodel.XWPFRun;
-import org.apache.poi.xwpf.usermodel.XWPFStyle;
-import org.apache.poi.xwpf.usermodel.XWPFStyles;
-import org.apache.poi.xwpf.usermodel.XWPFTable;
-import org.apache.poi.xwpf.usermodel.XWPFTableCell;
-import org.apache.poi.xwpf.usermodel.XWPFTableRow;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTDecimalNumber;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTFonts;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTInd;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTP;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPPr;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTRPr;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSpacing;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTString;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTStyle;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTbl;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTc;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTcPr;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.STStyleType;
+import org.apache.poi.xwpf.usermodel.*;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -41,6 +20,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -131,12 +111,8 @@ public class WordReporter {
         int index = 0;
         int indexTwo = 0;
 
-        Map<String, List<Map.Entry<String, List<TableParameter>>>> allDataMap = paramsMap.entrySet()
+        Map<String, List<Map.Entry<String, List<TableParameter>>>> allMap = paramsMap.entrySet()
                 .stream().collect(Collectors.groupingBy(v -> v.getKey().split("---")[0]));
-
-        Map<String, List<Map.Entry<String, List<TableParameter>>>> allMap = new LinkedHashMap<>();
-        allDataMap.entrySet().stream().sorted(Map.Entry.comparingByKey())
-                .forEachOrdered(x -> allMap.put(x.getKey(), x.getValue()));
 
         List<Integer> indexList = new ArrayList<>();
         for (Map.Entry<String, List<Map.Entry<String, List<TableParameter>>>> myMap : allMap.entrySet()) {
@@ -148,42 +124,31 @@ public class WordReporter {
             }
             for (Map.Entry<String, List<TableParameter>> parameterMap : myMap.getValue()) {
                 List<TableParameter> exportList = parameterMap.getValue();
-                for (int i = 0; i < exportList.size(); i++) {
+                for (TableParameter tableParameter : exportList) {
                     Map<String, String> map = new HashMap<>();
-                    map.put("xuhao", (i + 1) + "");
-                    map.put("a", exportList.get(i).getColumnName());
-                    map.put("b", exportList.get(i).getColumnType());
-                    map.put("c", exportList.get(i).getLength());
-                    map.put("d", exportList.get(i).getIsNullAble());
-                    map.put("e", exportList.get(i).getColumnDefault());
-                    map.put("f", exportList.get(i).getDecimalPlaces());
-                    map.put("g", exportList.get(i).getColumnComment());
+                    map.put("xuhao", tableParameter.getNo());
+                    map.put("a", tableParameter.getColumnName());
+                    map.put("b", tableParameter.getColumnType());
+                    map.put("c", tableParameter.getLength());
+                    map.put("d", tableParameter.getIsNullAble());
+                    map.put("e", tableParameter.getColumnDefault());
+                    map.put("f", tableParameter.getDecimalPlaces());
+                    map.put("g", tableParameter.getColumnComment());
                     list.add(map);
                 }
                 paramsValueMap.put("tableName" + index, parameterMap.getKey().split("---")[1]);
                 if (indexMap.size() > 0) {
                     String name = parameterMap.getKey().split("\\[")[0];
                     List<IndexInfoVO> indexInfoVOList = indexMap.get(name);
-                    if (indexInfoVOList.isEmpty()) {
+                    for (int j = 0; j < indexInfoVOList.size(); j++) {
                         Map<String, String> map = new HashMap<>();
-                        map.put("xuhao", "1");
-                        map.put("name", "");
-                        map.put("columnName", "");
-                        map.put("indexType", "");
-                        map.put("indexMethod", "");
-                        map.put("comment", "");
+                        map.put("xuhao", (j + 1) + "");
+                        map.put("name", indexInfoVOList.get(j).getName());
+                        map.put("columnName", indexInfoVOList.get(j).getColumnName());
+                        map.put("indexType", indexInfoVOList.get(j).getIndexType());
+                        map.put("indexMethod", indexInfoVOList.get(j).getIndexMethod());
+                        map.put("comment", indexInfoVOList.get(j).getComment());
                         indexListMap.add(map);
-                    } else {
-                        for (int j = 0; j < indexInfoVOList.size(); j++) {
-                            Map<String, String> map = new HashMap<>();
-                            map.put("xuhao", (j + 1) + "");
-                            map.put("name", indexInfoVOList.get(j).getName());
-                            map.put("columnName", indexInfoVOList.get(j).getColumnName());
-                            map.put("indexType", indexInfoVOList.get(j).getIndexType());
-                            map.put("indexMethod", indexInfoVOList.get(j).getIndexMethod());
-                            map.put("comment", indexInfoVOList.get(j).getComment());
-                            indexListMap.add(map);
-                        }
                     }
                 }
                 index++;
@@ -256,7 +221,7 @@ public class WordReporter {
                 xwpfDocument.setTable(i + 1, newTable1);
 
                 XWPFParagraph blankParagraph = xwpfDocument.createParagraph();
-                blankParagraph.setSpacingBefore(200);
+                blankParagraph.setSpacingBefore(newTable1.getNumberOfRows() > 1 ? newTable1.getNumberOfRows() * 300 + 200 : 100);
                 // 创建一个空的Table
                 xwpfDocument.createTable();
                 // 将table设置到word中
@@ -350,16 +315,16 @@ public class WordReporter {
             }
             for (Map.Entry<String, List<TableParameter>> parameterMap : myMap.getValue()) {
                 List<TableParameter> exportList = parameterMap.getValue();
-                for (int i = 0; i < exportList.size(); i++) {
+                for (TableParameter tableParameter : exportList) {
                     Map<String, String> map = new HashMap<>();
-                    map.put("xuhao", (i + 1) + "");
-                    map.put("a", exportList.get(i).getColumnName());
-                    map.put("b", exportList.get(i).getColumnType());
-                    map.put("c", exportList.get(i).getLength());
-                    map.put("d", exportList.get(i).getIsNullAble());
-                    map.put("e", exportList.get(i).getColumnDefault());
-                    map.put("f", exportList.get(i).getDecimalPlaces());
-                    map.put("g", exportList.get(i).getColumnComment());
+                    map.put("xuhao", tableParameter.getNo());
+                    map.put("a", tableParameter.getColumnName());
+                    map.put("b", tableParameter.getColumnType());
+                    map.put("c", tableParameter.getLength());
+                    map.put("d", tableParameter.getIsNullAble());
+                    map.put("e", tableParameter.getColumnDefault());
+                    map.put("f", tableParameter.getDecimalPlaces());
+                    map.put("g", tableParameter.getColumnComment());
                     list.add(map);
                 }
                 paramsValueMap.put("tableName" + index, parameterMap.getKey().split("---")[1]);
@@ -496,7 +461,7 @@ public class WordReporter {
 
 
         // style defines a heading of the given level
-        CTPPr ppr = CTPPr.Factory.newInstance();
+        CTPPrGeneral ppr = CTPPrGeneral.Factory.newInstance();
         ppr.setOutlineLvl(indentNumber);
         ctStyle.setPPr(ppr);
 
@@ -745,8 +710,8 @@ public class WordReporter {
             cellR.setUnderline(tmpR.getUnderline());
             cellR.setColor(tmpR.getColor());
             cellR.setTextPosition(tmpR.getTextPosition());
-            if (tmpR.getFontSize() != -1) {
-                cellR.setFontSize(tmpR.getFontSize());
+            if (tmpR.getFontSizeAsDouble() != -1) {
+                cellR.setFontSize(tmpR.getFontSizeAsDouble());
             }
             if (tmpR.getFontFamily() != null) {
                 cellR.setFontFamily(tmpR.getFontFamily());
@@ -754,12 +719,12 @@ public class WordReporter {
             if (tmpR.getCTR() != null) {
                 if (tmpR.getCTR().isSetRPr()) {
                     CTRPr tmpRPr = tmpR.getCTR().getRPr();
-                    if (tmpRPr.isSetRFonts()) {
-                        CTFonts tmpFonts = tmpRPr.getRFonts();
+                    if (tmpRPr.getRFontsList().size() > 0) {
+                        CTFonts tmpFonts = tmpRPr.getRFontsList().get(0);
                         CTRPr cellRPr = cellR.getCTR().isSetRPr() ? cellR
                                 .getCTR().getRPr() : cellR.getCTR().addNewRPr();
-                        CTFonts cellFonts = cellRPr.isSetRFonts() ? cellRPr
-                                .getRFonts() : cellRPr.addNewRFonts();
+                        CTFonts cellFonts = cellRPr.getRFontsList().size() > 0 ? cellRPr
+                                .getRFontsList().get(0) : cellRPr.addNewRFonts();
                         cellFonts.setAscii(tmpFonts.getAscii());
                         cellFonts.setAsciiTheme(tmpFonts.getAsciiTheme());
                         cellFonts.setCs(tmpFonts.getCs());
@@ -768,6 +733,7 @@ public class WordReporter {
                         cellFonts.setEastAsiaTheme(tmpFonts.getEastAsiaTheme());
                         cellFonts.setHAnsi(tmpFonts.getHAnsi());
                         cellFonts.setHAnsiTheme(tmpFonts.getHAnsiTheme());
+                        cellFonts.setHint(tmpFonts.getHint());
                     }
                 }
             }
@@ -812,7 +778,7 @@ public class WordReporter {
                     if (tmpSpacing.getBeforeLines() != null) {
                         cellSpacing.setBeforeLines(tmpSpacing.getBeforeLines());
                     }
-                    if (tmpSpacing.getLine() != null) {
+                    if (!Objects.equals(tmpSpacing.getLine(), new BigInteger("0"))) {
                         cellSpacing.setLine(tmpSpacing.getLine());
                     }
                     if (tmpSpacing.getLineRule() != null) {
@@ -860,12 +826,12 @@ public class WordReporter {
      * @return
      * @throws IOException
      */
-    public boolean generate(String outDocPath) throws IOException {
+    public XWPFDocument generate(String outDocPath) throws IOException {
         outputStream = new FileOutputStream(outDocPath);
         xwpfDocument.write(outputStream);
         this.close(outputStream);
         this.close(inputStream);
-        return true;
+        return xwpfDocument;
     }
 
     /**

@@ -39,8 +39,8 @@ public class Navicat11Cipher extends NavicatCipher {
     private static void initChiperEncrypt() {
         try {
             // Must use NoPadding
-            _Encryptor = javax.crypto.Cipher.getInstance("Blowfish/ECB/NoPadding");
-            _Encryptor.init(javax.crypto.Cipher.ENCRYPT_MODE, _Key);
+            _Encryptor = Cipher.getInstance("Blowfish/ECB/NoPadding");
+            _Encryptor.init(Cipher.ENCRYPT_MODE, _Key);
         } catch (Exception e) {
             LogManager.writeLogFile(e, log);
         }
@@ -49,8 +49,8 @@ public class Navicat11Cipher extends NavicatCipher {
     private static void initChiperDecrypt() {
         try {
             // Must use NoPadding
-            _Decryptor = javax.crypto.Cipher.getInstance("Blowfish/ECB/NoPadding");
-            _Decryptor.init(javax.crypto.Cipher.DECRYPT_MODE, _Key);
+            _Decryptor = Cipher.getInstance("Blowfish/ECB/NoPadding");
+            _Decryptor.init(Cipher.DECRYPT_MODE, _Key);
         } catch (Exception e) {
             LogManager.writeLogFile(e, log);
         }

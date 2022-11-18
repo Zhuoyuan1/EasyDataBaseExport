@@ -2,6 +2,7 @@ package com.easydatabaseexport.enums;
 
 /**
  * UpdateEnum
+ *
  * @author lzy
  * @date 2022/5/20 13:44
  **/
@@ -12,7 +13,7 @@ public enum UpdateEnum {
     private final String key;
     private final String value;
 
-    private UpdateEnum(String key, String value) {
+    UpdateEnum(String key, String value) {
         this.key = key;
         this.value = value;
     }

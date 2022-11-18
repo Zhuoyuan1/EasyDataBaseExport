@@ -17,7 +17,8 @@ import java.awt.event.MouseEvent;
  * @author lzy
  */
 public class LinkLabel extends JLabel {
-    private String text, url;
+    private final String text;
+    private final String url;
     private boolean isSupported;
 
     public LinkLabel(String text, String url) {

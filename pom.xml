@@ -9,7 +9,7 @@
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <poi.version>3.11-beta2</poi.version>
+        <poi.version>5.2.2</poi.version>
         <lombok.version>1.18.6</lombok.version>
         <mysql.version>8.0.29</mysql.version>
         <oracle.version>19.7.0.0</oracle.version>
@@ -18,9 +18,10 @@
         <db2.version>11.5.7.0</db2.version>
         <sqlite.version>3.36.0.3</sqlite.version>
         <ini4j.version>0.5.2</ini4j.version>
-        <fastjson.version>1.2.75</fastjson.version>
+        <fastjson.version>1.2.83</fastjson.version>
         <druid.version>1.1.24</druid.version>
         <substance.version>7.3</substance.version>
+        <itext7.version>7.2.4</itext7.version>
     </properties>
     <dependencies>
         <!-- Mysql驱动包 -->
@@ -83,6 +84,15 @@
             <systemPath>${basedir}/lib/kingbase8-8.6.0.jar</systemPath>
         </dependency>
 
+        <!--虚谷驱动-->
+        <dependency>
+            <groupId>com.xugu</groupId>
+            <artifactId>cloudjdbc</artifactId>
+            <version>12.0.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/xugu-jdbc-12.0.0.jar</systemPath>
+        </dependency>
+
         <!--lombok-->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -111,6 +121,29 @@
             <groupId>org.ini4j</groupId>
             <artifactId>ini4j</artifactId>
             <version>${ini4j.version}</version>
+        </dependency>
+
+        <!-- itextpdf -->
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>kernel</artifactId>
+            <version>${itext7.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>io</artifactId>
+            <version>${itext7.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>layout</artifactId>
+            <version>${itext7.version}</version>
+        </dependency>
+        <!-- 中文字体支持 -->
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>font-asian</artifactId>
+            <version>${itext7.version}</version>
         </dependency>
     </dependencies>
 

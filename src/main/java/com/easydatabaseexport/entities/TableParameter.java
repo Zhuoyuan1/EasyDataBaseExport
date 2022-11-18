@@ -12,7 +12,10 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class TableParameter {
-
+    /**
+     * 序号
+     **/
+    private String no;
     /**
      * 字段名
      **/
@@ -42,7 +45,7 @@ public class TableParameter {
      **/
     private String decimalPlaces;
     /**
-     * 备注
+     * 注释
      **/
     private String columnComment;
 

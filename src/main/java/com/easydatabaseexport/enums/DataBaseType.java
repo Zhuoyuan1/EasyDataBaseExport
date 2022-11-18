@@ -37,7 +37,11 @@ public enum DataBaseType {
     /**
      * KINGBASE8
      **/
-    KINGBASE8("jdbc:kingbase8://%s:%s/%s");
+    KINGBASE8("jdbc:kingbase8://%s:%s/%s"),
+    /**
+     * XUGU
+     **/
+    XUGU("jdbc:xugu://%s:%s/%s?characterEncoding=UTF-8");
 
     private String urlString;
 

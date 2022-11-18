@@ -8,6 +8,7 @@ import com.easydatabaseexport.database.mysql.impl.MySqlDataResultImpl;
 import com.easydatabaseexport.database.oracle.impl.OracleDataResultImpl;
 import com.easydatabaseexport.database.postgresql.impl.PostgreSqlDataResultImpl;
 import com.easydatabaseexport.database.sqlserver.impl.SqlServerDataResultImpl;
+import com.easydatabaseexport.database.xugu.impl.XuguDataResultImpl;
 import com.easydatabaseexport.enums.DataBaseType;
 import lombok.SneakyThrows;
 
@@ -35,6 +36,7 @@ public class DataBaseFactory {
         REPORT_POOL.put(DataBaseType.DB2.name(), new Db2DataResultImpl());
         REPORT_POOL.put(DataBaseType.DM.name(), new DmDataResultImpl());
         REPORT_POOL.put(DataBaseType.KINGBASE8.name(), new KingBaseDataV8ResultImpl());
+        REPORT_POOL.put(DataBaseType.XUGU.name(), new XuguDataResultImpl());
     }
 
     /**

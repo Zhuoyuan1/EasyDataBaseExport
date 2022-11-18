@@ -77,7 +77,7 @@ public class ConnectDetector {
         try {
             //获取数据库连接对象
             CommonConstant.connection = dataSource.getCreateConnection(urlText, userText, passwdText);
-            URL url = JCheckBoxTree.class.getResource("/success.png");
+            URL url = JCheckBoxTree.class.getResource("/images/success.png");
             map.put(CommonConstant.SUCCESS, msg);
             if (confirm) {
                 ConnectDetector.urlText = urlText;

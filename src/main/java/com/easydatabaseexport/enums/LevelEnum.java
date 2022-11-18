@@ -17,7 +17,7 @@ public enum LevelEnum {
     private final String level;
     private final String desc;
 
-    private LevelEnum(String level, String desc) {
+    LevelEnum(String level, String desc) {
         this.level = level;
         this.desc = desc;
     }

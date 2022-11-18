@@ -47,7 +47,7 @@ public class ThreadDiag extends Thread {
     protected void initDiag() {
         clueDiag = new JDialog(parentFrame, null, true);
         clueDiag.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-        URL wait = ThreadDiag.class.getResource("/wait.gif");
+        URL wait = ThreadDiag.class.getResource("/images/wait.gif");
         Image image = Toolkit.getDefaultToolkit().getImage(wait);
 
         JPanel testPanel = new JPanel(new BorderLayout()) {

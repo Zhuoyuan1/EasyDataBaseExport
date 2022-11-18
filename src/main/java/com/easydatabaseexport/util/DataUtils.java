@@ -24,13 +24,14 @@ public class DataUtils {
         Object[][] o = new Object[data.size()][data.get(0).toString().split(",").length];
         for (int i = 0; i < data.size(); i++) {
             TableParameter medicine = (TableParameter) data.get(i);
-            o[i][0] = medicine.getColumnName();
-            o[i][1] = medicine.getColumnType();
-            o[i][2] = medicine.getLength();
-            o[i][3] = medicine.getIsNullAble();
-            o[i][4] = medicine.getColumnDefault();
-            o[i][5] = medicine.getDecimalPlaces();
-            o[i][6] = medicine.getColumnComment();
+            o[i][0] = (i + 1);
+            o[i][1] = medicine.getColumnName();
+            o[i][2] = medicine.getColumnType();
+            o[i][3] = medicine.getLength();
+            o[i][4] = medicine.getIsNullAble();
+            o[i][5] = medicine.getColumnDefault();
+            o[i][6] = medicine.getDecimalPlaces();
+            o[i][7] = medicine.getColumnComment();
         }
         return o;
     }

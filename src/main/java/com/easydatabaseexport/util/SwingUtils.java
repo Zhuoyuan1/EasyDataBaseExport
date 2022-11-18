@@ -6,6 +6,7 @@ import com.easydatabaseexport.ui.IndexJavaFrame;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -39,7 +40,6 @@ public class SwingUtils {
         @SneakyThrows
         @Override
         public void actionPerformed(ActionEvent event) {
-            J_LABEL.setText("");
             J_LABEL.setText("正在重启中，倒计时 " + SECONDS.getAndDecrement() + " s......");
             if (SECONDS.get() == -2) {
                 TIMER_FRAME.dispose();
@@ -50,7 +50,6 @@ public class SwingUtils {
                     try {
                         CommonConstant.initByReboot();
                         SECONDS.set(2);
-                        TIMER_FRAME.setTitle("正在重启中，倒计时 " + SECONDS.getAndDecrement() + " s......");
                         IndexJavaFrame.connectFrame();
                     } catch (Exception e) {
                         LogManager.writeLogFile(e, log);

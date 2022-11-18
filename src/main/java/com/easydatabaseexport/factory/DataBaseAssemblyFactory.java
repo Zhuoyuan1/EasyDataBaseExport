@@ -34,6 +34,7 @@ public class DataBaseAssemblyFactory {
         REPORT_POOL.put(DataBaseType.SQLSERVER.name(), new ConDatabaseModeTableImpl());
         REPORT_POOL.put(DataBaseType.POSTGRESQL.name(), new ConDatabaseModeTableImpl());
         REPORT_POOL.put(DataBaseType.KINGBASE8.name(), new ConDatabaseModeTableImpl());
+        REPORT_POOL.put(DataBaseType.XUGU.name(), new ConDatabaseModeTableImpl());
     }
 
     /**

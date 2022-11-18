@@ -1,24 +1,31 @@
 package com.easydatabaseexport.ui;
 
 import com.easydatabaseexport.common.CommonConstant;
+import com.easydatabaseexport.common.PatternConstant;
 import com.easydatabaseexport.enums.ConfigEnum;
 import com.easydatabaseexport.enums.YesNoEnum;
 import com.easydatabaseexport.util.FileIniRead;
 import com.easydatabaseexport.util.FileOperateUtil;
+import com.easydatabaseexport.util.StringUtil;
 import com.easydatabaseexport.util.SwingUtils;
+import com.mysql.cj.util.StringUtils;
 import lombok.SneakyThrows;
 
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
+import javax.swing.JSplitPane;
+import javax.swing.JTextField;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 
 /**
  * 配置UI
@@ -34,47 +41,33 @@ public class ConfigJavaFrame {
 
     public void configFrame() {
         JFrame jFrame = new JFrame("配置");
-        jFrame.setSize(250, 250);
-        jFrame.setResizable(false);
+        jFrame.setSize(500, 250);
+        //jFrame.setResizable(false);
         jFrame.setLayout(new BorderLayout());
-        JPanel jPanel = new JPanel();
-        JLabel jLabel = new JLabel(ConfigEnum.INDEX.getValue());
-        JRadioButton yesButton = new JRadioButton("是");
-        JRadioButton noButton = new JRadioButton("否");
-        ButtonGroup buttonGroup = new ButtonGroup();
-        buttonGroup.add(yesButton);
-        buttonGroup.add(noButton);
+        JCheckBox yesButton = new JCheckBox(ConfigEnum.INDEX.getValue());
         //多sheet配置
-        JLabel sheetLabel = new JLabel(ConfigEnum.SHEET.getValue());
-        JRadioButton sheetYesButton = new JRadioButton("是");
-        JRadioButton sheetNoButton = new JRadioButton("否");
-        ButtonGroup sheetButtonGroup = new ButtonGroup();
-        sheetButtonGroup.add(sheetYesButton);
-        sheetButtonGroup.add(sheetNoButton);
+        JCheckBox sheetYesButton = new JCheckBox(ConfigEnum.SHEET.getValue());
         JPanel jPanel2 = new JPanel();
         JButton confirmButton = new JButton("保存");
         JButton closeButton = new JButton("关闭");
 
         //增加鼠标手形
-        SwingUtils.addHandCursorLister(Cursor.HAND_CURSOR, confirmButton, closeButton,
-                yesButton, noButton, sheetYesButton, sheetNoButton);
+        SwingUtils.addHandCursorLister(Cursor.HAND_CURSOR, confirmButton, closeButton);
 
         jPanel2.add(confirmButton);
         jPanel2.add(closeButton);
         // 读取ini文件配置
         CommonConstant.initCheckAllKey(CommonConstant.EXPORT);
         // 是否导出索引
-        if (YesNoEnum.YES_1.getValue().equals(CommonConstant.configMap.get(ConfigEnum.INDEX.getKey()))) {
-            yesButton.setSelected(true);
-        } else {
-            noButton.setSelected(true);
-        }
+        yesButton.setSelected(YesNoEnum.YES_1.getValue().equals(CommonConstant.configMap.get(ConfigEnum.INDEX.getKey())));
         // 是否多sheet
-        if (YesNoEnum.YES_1.getValue().equals(CommonConstant.configMap.get(ConfigEnum.SHEET.getKey()))) {
-            sheetYesButton.setSelected(true);
-        } else {
-            sheetNoButton.setSelected(true);
-        }
+        sheetYesButton.setSelected(YesNoEnum.YES_1.getValue().equals(CommonConstant.configMap.get(ConfigEnum.SHEET.getKey())));
+        //赋值
+        String indexHead = CommonConstant.configMap.get(ConfigEnum.INDEX_TABLE_HEAD.getKey());
+        String tableHead = CommonConstant.configMap.get(ConfigEnum.TABLE_HEAD.getKey());
+        JSplitPane allTotalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        JSplitPane totalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        JSplitPane totalSplitPane2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         confirmButton.addActionListener(new ActionListener() {
             @SneakyThrows
             @Override
@@ -91,10 +84,45 @@ public class ConfigJavaFrame {
                 } else {
                     sheetValue = YesNoEnum.NO_0.getValue();
                 }
+                StringBuilder tableHead = new StringBuilder();
+                StringBuilder indexTableHead = new StringBuilder();
+
+                Component component1 = totalSplitPane2.getTopComponent();
+                if (component1 instanceof JPanel) {
+                    for (Component index : ((JPanel) component1).getComponents()) {
+                        if (index instanceof JCheckBox) {
+                            JCheckBox jCheckBox = (JCheckBox) index;
+                            if (jCheckBox.isSelected()) {
+                                indexTableHead.append(PatternConstant.MD_SPLIT).append(jCheckBox.getText());
+                            }
+                        }
+                    }
+                }
+                indexTableHead.append(PatternConstant.MD_SPLIT);
+
+                Component component = totalSplitPane2.getBottomComponent();
+                if (component instanceof JPanel) {
+                    for (Component index : ((JPanel) component).getComponents()) {
+                        if (index instanceof JCheckBox) {
+                            JCheckBox jCheckBox = (JCheckBox) index;
+                            if (jCheckBox.isSelected()) {
+                                tableHead.append(PatternConstant.MD_SPLIT).append(jCheckBox.getText());
+                            }
+                        }
+                    }
+                }
+                tableHead.append(PatternConstant.MD_SPLIT);
+
+                System.out.println(tableHead);
+                System.out.println(indexTableHead);
                 FileOperateUtil.writeData(FileOperateUtil.getSavePath() + FileIniRead.FILE_NAME, CommonConstant.INI_NODE_KEY,
                         ConfigEnum.INDEX.getKey(), value);
                 FileOperateUtil.writeData(FileOperateUtil.getSavePath() + FileIniRead.FILE_NAME, CommonConstant.INI_NODE_KEY,
                         ConfigEnum.SHEET.getKey(), sheetValue);
+                FileOperateUtil.writeData(FileOperateUtil.getSavePath() + FileIniRead.FILE_NAME, CommonConstant.INI_NODE_KEY,
+                        ConfigEnum.TABLE_HEAD.getKey(), tableHead.toString().length() == 1 ? "-1" : tableHead.toString());
+                FileOperateUtil.writeData(FileOperateUtil.getSavePath() + FileIniRead.FILE_NAME, CommonConstant.INI_NODE_KEY,
+                        ConfigEnum.INDEX_TABLE_HEAD.getKey(), indexTableHead.toString().length() == 1 ? "-1" : indexTableHead.toString());
                 CommonConstant.checkConfigIniFile();
                 JOptionPane.showMessageDialog(null, "保存成功！", "提醒", JOptionPane.PLAIN_MESSAGE);
                 jFrame.dispose();
@@ -107,21 +135,54 @@ public class ConfigJavaFrame {
                 jFrame.dispose();
             }
         });
-        jPanel.add(new JLabel("【Word】配置"));
-        jPanel.add(new JLabel("<html></br>--------------------------------------------</br></html>"));
-        jPanel.add(jLabel);
-        jPanel.add(yesButton);
-        jPanel.add(noButton);
-        jPanel.add(new JLabel("【Excel】配置"));
-        jPanel.add(new JLabel("<html></br>--------------------------------------------</br></html>"));
-        jPanel.add(sheetLabel);
-        jPanel.add(sheetYesButton);
-        jPanel.add(sheetNoButton);
-        jFrame.add(jPanel);
+        allTotalSplitPane.setDividerSize(0);
+        totalSplitPane.setDividerSize(0);
+        JPanel topPanel = new JPanel();
+        topPanel.add(new JLabel("【Word、Markdown、Html、Pdf】"));
+        topPanel.add(yesButton);
+        totalSplitPane.setTopComponent(topPanel);
+        JPanel topPanel1 = new JPanel();
+        topPanel1.add(new JLabel("【Excel】"));
+        topPanel1.add(sheetYesButton);
+        totalSplitPane.setBottomComponent(topPanel1);
+        allTotalSplitPane.setTopComponent(totalSplitPane);
+
+        totalSplitPane2.setDividerSize(0);
+        JPanel header = new JPanel();
+        header.add(new JLabel("【索引表头】"));
+        //添加索引表头
+        Arrays.stream(CommonConstant.INDEX_HEAD_NAMES).filter(StringUtil::isNotEmpty).forEach(v -> {
+            JCheckBox head = new JCheckBox(v);
+            head.setSelected(indexHead.contains(v));
+            header.add(ConfigEnum.INDEX_TABLE_HEAD.getKey(), head);
+        });
+        totalSplitPane2.setTopComponent(header);
+
+        JPanel header2 = new JPanel();
+        header2.add(new JLabel("【字段表头】"));
+        //添加字段表头
+        Arrays.stream(CommonConstant.COLUMN_HEAD_NAMES).filter(StringUtil::isNotEmpty).forEach(v -> {
+            JCheckBox head = new JCheckBox(v);
+            head.setSelected(tableHead.contains(v));
+            header2.add(ConfigEnum.TABLE_HEAD.getKey(), head);
+        });
+        totalSplitPane2.setBottomComponent(header2);
+
+        allTotalSplitPane.setTopComponent(totalSplitPane);
+        allTotalSplitPane.setBottomComponent(totalSplitPane2);
+        totalSplitPane.setEnabled(false);
+        totalSplitPane2.setEnabled(false);
+        allTotalSplitPane.setEnabled(false);
+        jFrame.add(allTotalSplitPane);
         jFrame.add(jPanel2, BorderLayout.SOUTH);
         //居中
         jFrame.setLocationRelativeTo(null);
         jFrame.setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        ConfigJavaFrame v = new ConfigJavaFrame();
+        v.configFrame();
     }
 
 }

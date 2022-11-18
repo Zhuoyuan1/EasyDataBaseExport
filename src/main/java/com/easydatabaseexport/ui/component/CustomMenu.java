@@ -93,10 +93,16 @@ public class CustomMenu {
 
         JMenuItem exportExcel = new JMenuItem("生成Excel");
         JMenuItem exportWord = new JMenuItem("生成Word");
+        JMenuItem exportMarkdown = new JMenuItem("生成Markdown");
+        JMenuItem exportHtml = new JMenuItem("生成Html");
+        JMenuItem exportPdf = new JMenuItem("生成Pdf");
         JMenuItem configMenu = new JMenuItem("配置...");
 
         exportMenu.add(exportExcel);
         exportMenu.add(exportWord);
+        exportMenu.add(exportMarkdown);
+        exportMenu.add(exportHtml);
+        exportMenu.add(exportPdf);
         exportMenu.addSeparator();
         exportMenu.add(configMenu);
 

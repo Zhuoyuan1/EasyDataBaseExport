@@ -83,7 +83,7 @@ public abstract class AbstractDataResultImpl implements DataResult {
 
     public JScrollPane getCenterInfo(List<TableParameter> tableParameterList) {
         Object[][] obj = DataUtils.toArray(tableParameterList);
-        JTable table = new JTable(obj, CommonConstant.COLUMN_NAMES);
+        JTable table = new JTable(obj, CommonConstant.COLUMN_HEAD_NAMES);
         // 创建表格标题对象
         JTableHeader head = table.getTableHeader();
         // 设置表头大小
@@ -96,12 +96,12 @@ public abstract class AbstractDataResultImpl implements DataResult {
         for (int i = 0; i < colunms; i++) {
             column = table.getColumnModel().getColumn(i);
             /*将每一列的默认宽度设置为200*/
-            if (i == 0) {
+            if (i == 1) {
                 column.setPreferredWidth(300);
-            } else if (i == 3 || i == 4 || i == 5) {
-                column.setPreferredWidth(100);
-            } else {
+            } else if (i == 2) {
                 column.setPreferredWidth(200);
+            } else {
+                column.setPreferredWidth(100);
             }
         }
 

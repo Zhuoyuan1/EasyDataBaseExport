@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
 
-    private static List<GlobalException> globalExceptionList = Collections.singletonList(new EasyRuntimeException());
+    private static final List<GlobalException> globalExceptionList = Collections.singletonList(new EasyRuntimeException());
 
     /**
      * describe 异常处理器

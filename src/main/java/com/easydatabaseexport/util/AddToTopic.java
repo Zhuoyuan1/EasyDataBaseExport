@@ -6,9 +6,7 @@ import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSimpleField;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.STOnOff;
 
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -26,12 +24,9 @@ public class AddToTopic {
         generateTOC("C:\\Users\\admin\\Desktop\\1.doc","C:\\Users\\admin\\Desktop\\2.doc");
     }*/
 
-    public static void generateTOC(String sourcePath, String targetPath) throws IOException {
-        FileInputStream fileInputStream = null;
+    public static void generateTOC(XWPFDocument document, String targetPath) throws IOException {
         OutputStream out = null;
         try {
-            fileInputStream = new FileInputStream(sourcePath);
-            XWPFDocument document = new XWPFDocument(fileInputStream);
             String findText = "目录哈哈";
             String replaceText = "";
             for (XWPFParagraph p : document.getParagraphs()) {
@@ -52,9 +47,6 @@ public class AddToTopic {
         } catch (Exception e) {
             LogManager.writeLogFile(e, log);
         } finally {
-            if (fileInputStream != null) {
-                fileInputStream.close();
-            }
             if (out != null) {
                 out.close();
             }
@@ -64,7 +56,7 @@ public class AddToTopic {
     private static void addField(XWPFParagraph paragraph, String fieldName) {
         CTSimpleField ctSimpleField = paragraph.getCTP().addNewFldSimple();
         ctSimpleField.setInstr(fieldName);
-        ctSimpleField.setDirty(STOnOff.TRUE);
+        ctSimpleField.setDirty(true);
         ctSimpleField.addNewR().addNewT().setStringValue("<>");
     }
 

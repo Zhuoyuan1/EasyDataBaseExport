@@ -1,5 +1,7 @@
 package com.easydatabaseexport.common;
 
+import com.easydatabaseexport.enums.LevelEnum;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,13 +15,13 @@ public class EnvironmentConstant {
     /**
      * 本版本专属MD5码
      **/
-    public static final String FILE_MD5_VALUE = "f1abda441b476213d1fda2d0f4c2acba";
+    public static final String FILE_MD5_VALUE = "17735ee05f26de8be10c5b69e54fbe37";
     /**
      * 运行等级
      **/
-    public static final String RUN_LEVEL = "dev";
+    public static final String RUN_LEVEL = LevelEnum.PROD.getLevel();
     /**
      * 模板文件
      **/
-    public static final List<String> TEMPLATE_FILE = Arrays.asList("template_index.docx", "template.docx");
+    public static final List<String> TEMPLATE_FILE = Arrays.asList("template_index.docx", "template.docx", "template.html");
 }

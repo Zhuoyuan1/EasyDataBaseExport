@@ -6,6 +6,7 @@ import com.easydatabaseexport.entities.IndexConfig;
 import com.easydatabaseexport.enums.DataBaseType;
 import com.easydatabaseexport.log.LogManager;
 import com.easydatabaseexport.ui.component.IndexMenu;
+import com.easydatabaseexport.ui.component.IpPortJComboBox;
 import com.easydatabaseexport.ui.component.ThreadDiag;
 import com.easydatabaseexport.ui.detector.ConnectDetector;
 import com.easydatabaseexport.util.AESCoder;
@@ -18,19 +19,8 @@ import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 import org.apache.commons.codec.binary.Base64;
 
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenuBar;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JSplitPane;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-import javax.swing.ToolTipManager;
+import javax.swing.*;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
@@ -52,7 +42,20 @@ import java.util.Vector;
 public class IndexJavaFrame {
 
     private static final String IP_PORT_TIPS = "<html>请填写ip（域名）和端口。<br/>① ip+端口格式：x.x.x.x:xxx（例：192.168.0.1:3306） " +
-            "<br/>② 域名+端口格式：xxx.xxx.xxx...:xxx（例：www.baidu.com:3306）<br/>*** SQLite为文件路径<html/>";
+            "<br/>② 域名+端口格式：xxx.xxx.xxx...:xxx（例：www.baidu.com:3306）";
+
+    private static final Vector<DataBaseType> DATA_BASE_TYPES = new Vector<>(Arrays.asList(DataBaseType.values()));
+
+    static final ImageIcon[] IMAGES = new ImageIcon[DATA_BASE_TYPES.size()];
+
+    static {
+        for (int i = 0; i < DATA_BASE_TYPES.size(); i++) {
+            IMAGES[i] = new ImageIcon(IndexJavaFrame.class.getResource("/images/" + DATA_BASE_TYPES.get(i).name().toLowerCase() + ".png"));
+            if (IMAGES[i] != null) {
+                IMAGES[i].setDescription(DATA_BASE_TYPES.get(i).name());
+            }
+        }
+    }
 
     public static void connectFrame() throws Exception {
         JFrame jFrame = new JFrame("连接");
@@ -61,8 +64,11 @@ public class IndexJavaFrame {
 
         byte[] key = AESCoder.readFileReturnByte();
 
-        Vector<DataBaseType> dataBaseTypes = new Vector<>(Arrays.asList(DataBaseType.values()));
-        JComboBox<DataBaseType> dataBaseType = new JComboBox<DataBaseType>(dataBaseTypes);
+        //数据库类型
+        JComboBox<DataBaseType> dataBaseType = new JComboBox<DataBaseType>(DATA_BASE_TYPES);
+        ComboBoxRenderer renderer = new ComboBoxRenderer();
+        renderer.setPreferredSize(new Dimension(20, 29));
+        dataBaseType.setRenderer(renderer);
         dataBaseType.setPreferredSize(new Dimension(230, 24));
 
         JLabel type = new JLabel("<html><span style='color:red'>*</span>数据库类型</html>");
@@ -144,15 +150,16 @@ public class IndexJavaFrame {
                 }
                 i++;
             }
-            JComboBox<IndexConfig> jComboBox = new JComboBox<>(ipPort);
-            // 可编辑
-            jComboBox.setEditable(true);
+            IpPortJComboBox jComboBox = new IpPortJComboBox(ipPort);
             //设置宽度
             jComboBox.setPreferredSize(new Dimension(230, 24));
             // 添加条目选中状态改变的监听器
             jComboBox.addItemListener(e -> {
                 // 只处理选中的状态
-                urlN.setText(Objects.requireNonNull(jComboBox.getSelectedItem()).toString());
+                if (Objects.isNull(jComboBox.getSelectedItem())) {
+                    return;
+                }
+                urlN.setText(jComboBox.getSelectedItem().toString());
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     if (jComboBox.getSelectedItem() instanceof IndexConfig) {
                         String mapKey = ((IndexConfig) jComboBox.getSelectedItem()).toMyString();
@@ -290,6 +297,50 @@ public class IndexJavaFrame {
 
         //检查更新
         CheckUpdateUtil.check();
+    }
+
+
+    static class ComboBoxRenderer extends JLabel implements ListCellRenderer {
+        public ComboBoxRenderer() {
+            setOpaque(true);
+            setHorizontalAlignment(LEFT);
+            setVerticalAlignment(CENTER);
+        }
+
+        /*
+         * This method finds the image and text corresponding
+         * to the selected value and returns the label, set up
+         * to display the text and image.
+         */
+        @Override
+        public Component getListCellRendererComponent(
+                JList list,
+                Object value,
+                int index,
+                boolean isSelected,
+                boolean cellHasFocus) {
+            //Get the selected index. (The index param isn't
+            //always valid, so just use the value.)
+            int selectedIndex = DATA_BASE_TYPES.indexOf(DataBaseType.matchType(String.valueOf(value)));
+
+            if (isSelected) {
+                setBackground(list.getSelectionBackground());
+                setForeground(list.getSelectionForeground());
+            } else {
+                setBackground(list.getBackground());
+                setForeground(list.getForeground());
+            }
+
+            //Set the icon and text. If icon was null, say so.
+            ImageIcon icon = IMAGES[selectedIndex];
+            String iconName = String.valueOf(value);
+            setIcon(icon);
+            if (icon != null) {
+                setText(iconName);
+                setFont(list.getFont());
+            }
+            return this;
+        }
     }
 
 }

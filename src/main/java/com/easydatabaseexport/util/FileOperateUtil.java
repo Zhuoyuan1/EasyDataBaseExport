@@ -44,7 +44,7 @@ public class FileOperateUtil {
      * @author lzy
      * @date 2021/5/31 15:30
      **/
-    public static String saveFile(String filepath, byte[] data) throws Exception {
+    public static String saveFile(String filepath, byte[] data) {
         if (data != null) {
             /*if (OSDetector.isWindows()){
                 filepath = "c:" + File.separator + filename;
@@ -53,10 +53,23 @@ public class FileOperateUtil {
             }*/
             File file = new File(filepath);
             if (!file.exists()) {
-                FileOutputStream fos = new FileOutputStream(file);
-                fos.write(data, 0, data.length);
-                fos.flush();
-                fos.close();
+                FileOutputStream fos = null;
+                try {
+                    fos = new FileOutputStream(file);
+                    fos.write(data, 0, data.length);
+                    fos.flush();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (null != fos) {
+                            fos.close();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
             }
         }
         return filepath;
@@ -274,15 +287,15 @@ public class FileOperateUtil {
                 log.info("请求失败！");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LogManager.writeLogFile(e, log);
         }
         return retStr.toString();
     }
 
-    public static void main(String[] args) {
-        /*writeData("E:\\MySQLTools-main\\src\\main\\resources\\template.ini", "sys", "1111=1");
+    /*public static void main(String[] args) {
+        writeData("E:\\MySQLTools-main\\src\\main\\resources\\template.ini", "sys", "1111=1");
         writeData("E:\\MySQLTools-main\\src\\main\\resources\\template.ini", "theme", "1");
-        writeData("E:\\MySQLTools-main\\src\\main\\resources\\template.ini", "theme", "2");*/
+        writeData("E:\\MySQLTools-main\\src\\main\\resources\\template.ini", "theme", "2");
         System.out.println(getLocalMd5File("C:\\Users\\Administrator\\Desktop\\MySQLToWordOrExcel\\target\\EasyDataBaseExport-0.0.1-SNAPSHOT-jar-with-dependencies.jar"));
-    }
+    }*/
 }

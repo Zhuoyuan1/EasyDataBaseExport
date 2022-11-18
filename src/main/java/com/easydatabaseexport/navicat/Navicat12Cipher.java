@@ -17,8 +17,8 @@ import java.nio.charset.StandardCharsets;
  */
 @Log
 public class Navicat12Cipher extends NavicatCipher {
-    private static SecretKeySpec _AesKey;
-    private static IvParameterSpec _AesIV;
+    private static final SecretKeySpec _AesKey;
+    private static final IvParameterSpec _AesIV;
 
     static {
         _AesKey = new SecretKeySpec("libcckeylibcckey".getBytes(StandardCharsets.UTF_8), "AES");

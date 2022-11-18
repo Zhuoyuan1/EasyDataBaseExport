@@ -20,6 +20,13 @@ public class StringUtil {
         return str;
     }
 
+    public static String stringNullForEmpty(String str) {
+        if (StringUtils.isNullOrEmpty(str)) {
+            return "";
+        }
+        return str;
+    }
+
     public static String join(Collection collection, String split) {
         StringBuilder stringBuffer = new StringBuilder();
         for (Iterator iterator = collection.iterator(); iterator.hasNext(); stringBuffer.append((String) iterator.next())) {
@@ -36,5 +43,12 @@ public class StringUtil {
 
     public static boolean isEmpty(CharSequence cs) {
         return cs == null || cs.length() == 0;
+    }
+
+    public static Object stringEqualHtml(String str) {
+        if (StringUtils.isNullOrEmpty(str)) {
+            return "<br>";
+        }
+        return str;
     }
 }

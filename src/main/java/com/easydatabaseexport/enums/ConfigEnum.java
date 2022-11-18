@@ -1,5 +1,7 @@
 package com.easydatabaseexport.enums;
 
+import com.easydatabaseexport.common.PatternConstant;
+
 /**
  * 该类为ini配置文件中的 key枚举
  *
@@ -7,13 +9,15 @@ package com.easydatabaseexport.enums;
  */
 public enum ConfigEnum {
     //索引
-    INDEX("index", "是否导出索引："),
-    SHEET("sheet", "是否导出多sheet：");
+    INDEX("index", "导出索引"),
+    SHEET("sheet", "多sheet"),
+    TABLE_HEAD("table_head", PatternConstant.TABLE_HEADER),
+    INDEX_TABLE_HEAD("index_table_head", PatternConstant.INDEX_TABLE_HEADER);
 
     private final String key;
     private final String value;
 
-    private ConfigEnum(String key, String value) {
+    ConfigEnum(String key, String value) {
         this.key = key;
         this.value = value;
     }

@@ -98,7 +98,7 @@ public class Db2DataResultImpl extends AbstractDataResultImpl implements DataRes
         return scroll;
     }
 
-    private static String sql = "SELECT TABSCHEMA,TABNAME,COLNAME COLUMN_NAME,COLNO,TYPESCHEMA,TYPENAME COLUMN_TYPE,\"LENGTH\"," +
+    private static final String sql = "SELECT TABSCHEMA,TABNAME,COLNAME COLUMN_NAME,COLNO,TYPESCHEMA,TYPENAME COLUMN_TYPE,\"LENGTH\"," +
             "\"SCALE\" DECIMAL_PLACES,TYPESTRINGUNITS,STRINGUNITSLENGTH,\"DEFAULT\" COLUMN_DEFAULT,\"NULLS\" IS_NULL_ABLE," +
             "REMARKS COLUMN_COMMENT FROM " +
             " SYSCAT.COLUMNS c " +

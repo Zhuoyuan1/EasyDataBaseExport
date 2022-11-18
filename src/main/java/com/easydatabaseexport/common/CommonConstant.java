@@ -12,9 +12,7 @@ import com.easydatabaseexport.util.StringUtil;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.UIManager;
+import javax.swing.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -22,6 +20,7 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -67,10 +66,12 @@ public class CommonConstant {
      **/
     public static List<TableParameter> tableParameterList = new ArrayList<>();
     /**
-     * 表结构字段
+     * 表head
      **/
-    public static final String[] COLUMN_NAMES =
-            {"列名", "类型", "长度", "是否为空", "默认值", "小数位", "备注"};
+    public static final String[] INDEX_HEAD_NAMES =
+            {"名称", "字段", "索引类型", "索引方法", "注释"};
+    public static final String[] COLUMN_HEAD_NAMES =
+            {"序号", "字段名", "类型", "长度", "是否为空", "默认值", "小数位", "注释"};
     /**
      * 表名
      **/
@@ -150,7 +151,12 @@ public class CommonConstant {
         } else if (EXPORT.equals(key)) {
             for (ConfigEnum configEnum : ConfigEnum.values()) {
                 if (!configMap.containsKey(configEnum.getKey())) {
-                    writeNewKey(configEnum.getKey(), null);
+                    if (configEnum.getKey().equals(ConfigEnum.TABLE_HEAD.getKey()) ||
+                            configEnum.getKey().equals(ConfigEnum.INDEX_TABLE_HEAD.getKey())) {
+                        writeNewKey(configEnum.getKey(), configEnum.getValue());
+                    } else {
+                        writeNewKey(configEnum.getKey(), null);
+                    }
                 }
             }
         }
@@ -182,7 +188,7 @@ public class CommonConstant {
     @SneakyThrows
     public static void initByReboot() {
         if (index < 0) {
-            //UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         } else if (index < THEMES.length) {
             try {
                 UIManager.setLookAndFeel(THEMES[index]);
