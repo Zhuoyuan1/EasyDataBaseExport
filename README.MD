@@ -124,7 +124,7 @@ EasyDataBaseExport
 Double click to run `assembly:assembly` to package
 
 Note: Some adopted drivers are not uploaded to Maven warehouse  
-If the packaging error is reported, you will be prompted that the package cannot be found. Please run `mvn install`  
+If the packaging error is reported, you will be prompted that the package cannot be found. Please run `mvn install` first.  
 ![img.png](https://github.com/Zhuoyuan1/MySQLToWordOrExcel/blob/main/image/install.png)
 
 ### ⏳ Download
