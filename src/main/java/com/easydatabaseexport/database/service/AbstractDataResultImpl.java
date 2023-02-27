@@ -35,27 +35,27 @@ public abstract class AbstractDataResultImpl implements DataResult {
 
     @SneakyThrows
     public ResultSet getResultSetBySql(String sql, String... params) {
-        PreparedStatement ppst = null;
-        ppst = CommonConstant.connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-        ResultSet rs = null;
+        PreparedStatement preparedStatement = null;
+        preparedStatement = CommonConstant.connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        ResultSet resultSet = null;
         for (int i = 1; i <= params.length; i++) {
-            ppst.setString(i, params[i - 1]);
+            preparedStatement.setString(i, params[i - 1]);
         }
-        rs = ppst.executeQuery();
-        return rs;
+        resultSet = preparedStatement.executeQuery();
+        return resultSet;
     }
 
     public <T> List<T> toList(T t, String sql) throws SQLException {
-        PreparedStatement ppst = null;
+        PreparedStatement preparedStatement = null;
         List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
-        ppst = CommonConstant.connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-        ResultSet rs = ppst.executeQuery();
-        while (rs.next()) {
+        preparedStatement = CommonConstant.connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()) {
             Map<String, String> resultMap = new HashMap<String, String>();
-            ResultSetMetaData metaData = rs.getMetaData();
+            ResultSetMetaData metaData = resultSet.getMetaData();
             int columnCount = metaData.getColumnCount();
             for (int i = 1; i < columnCount + 1; i++) {
-                resultMap.put(metaData.getColumnLabel(i), rs.getString(i));
+                resultMap.put(metaData.getColumnLabel(i), resultSet.getString(i));
             }
             resultList.add(resultMap);
         }
@@ -67,7 +67,6 @@ public abstract class AbstractDataResultImpl implements DataResult {
         CommonConstant.RIGHT.removeAll();
         JTabbedPane jPanel = getRightInfo(CommonConstant.RIGHT.getWidth(), CommonConstant.RIGHT.getHeight());
         CommonConstant.RIGHT.add(jPanel);
-        //CommonConstant.RIGHT.setLayout(new FlowLayout(FlowLayout.LEFT));
         CommonConstant.RIGHT.validate();
         CommonConstant.RIGHT.repaint();
 
@@ -83,7 +82,7 @@ public abstract class AbstractDataResultImpl implements DataResult {
 
     public JScrollPane getCenterInfo(List<TableParameter> tableParameterList) {
         Object[][] obj = DataUtils.toArray(tableParameterList);
-        JTable table = new JTable(obj, CommonConstant.COLUMN_HEAD_NAMES);
+        JTable table = new JTable(obj, CommonConstant.COLUMN_FINAL_HEAD_NAMES);
         // 创建表格标题对象
         JTableHeader head = table.getTableHeader();
         // 设置表头大小
@@ -104,7 +103,6 @@ public abstract class AbstractDataResultImpl implements DataResult {
                 column.setPreferredWidth(100);
             }
         }
-
         /*用JScrollPane装载JTable，这样超出范围的列就可以通过滚动条来查看*/
         return new JScrollPane(table);
     }

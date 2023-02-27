@@ -6,7 +6,7 @@ import com.easydatabaseexport.ui.IndexJavaFrame;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 
-import javax.swing.JCheckBox;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -21,6 +21,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.URL;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -31,30 +33,38 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Log
 public class SwingUtils {
 
-    private static final Timer TIMER = new Timer(1000, new Work());
-    private static final JFrame TIMER_FRAME = new JFrame();
-    private static final JLabel J_LABEL = new JLabel("", JLabel.CENTER);
+    private static Timer TIMER = null;
+    private static JFrame TIMER_FRAME = null;
     private static final AtomicInteger SECONDS = new AtomicInteger(2);
 
     static class Work implements ActionListener {
+
+        private final JLabel jLabel;
+
+        public Work(JLabel jLabel) {
+            this.jLabel = jLabel;
+        }
+
         @SneakyThrows
         @Override
         public void actionPerformed(ActionEvent event) {
-            J_LABEL.setText("正在重启中，倒计时 " + SECONDS.getAndDecrement() + " s......");
+            jLabel.setText("正在重启中，倒计时 " + SECONDS.getAndDecrement() + " s......");
             if (SECONDS.get() == -2) {
-                TIMER_FRAME.dispose();
+                if (Objects.nonNull(TIMER_FRAME)) {
+                    TIMER_FRAME.dispose();
+                }
                 TIMER.stop();
                 //读取配置文件哦
                 CommonConstant.index = Integer.parseInt(FileIniRead.getIniThemeIndex());
                 SwingUtilities.invokeLater(() -> {
                     try {
                         CommonConstant.initByReboot();
-                        SECONDS.set(2);
                         IndexJavaFrame.connectFrame();
                     } catch (Exception e) {
                         LogManager.writeLogFile(e, log);
                     }
                 });
+                SECONDS.set(2);
             }
         }
     }
@@ -68,14 +78,17 @@ public class SwingUtils {
     public static void rebootFrame(String msg, String title, JFrame jFrame, JFrame mainFrame) {
         int n = JOptionPane.showConfirmDialog(null, msg + "，是否立即重启？", title, JOptionPane.YES_NO_OPTION);
         if (n == 0) {
-            if (null != jFrame) {
+            if (Objects.nonNull(jFrame)) {
                 jFrame.dispose();
             }
-            if (null != mainFrame) {
+            if (Objects.nonNull(mainFrame)) {
                 mainFrame.dispose();
             }
             JPanel jPanel = new JPanel(new BorderLayout());
-            jPanel.add(J_LABEL, BorderLayout.CENTER);
+            JLabel jLabel = new JLabel("", JLabel.CENTER);
+            jPanel.add(jLabel, BorderLayout.CENTER);
+            TIMER_FRAME = new JFrame();
+            SwingUtils.changeLogo(TIMER_FRAME);
             TIMER_FRAME.add(jPanel);
             TIMER_FRAME.setTitle("重启");
             TIMER_FRAME.setSize(350, 100);
@@ -83,6 +96,7 @@ public class SwingUtils {
             TIMER_FRAME.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
             TIMER_FRAME.setResizable(false);
             TIMER_FRAME.setVisible(true);
+            TIMER = new Timer(1000, new Work(jLabel));
             TIMER.start();//开启定时器
         }
     }
@@ -107,5 +121,16 @@ public class SwingUtils {
                 });
             }
         }
+    }
+
+    @SneakyThrows
+    public static void changeLogo(JFrame frame) {
+        //更换logo
+        URL url = IndexJavaFrame.class.getResource("/images/logo.png");
+        if (Objects.isNull(url)) {
+            throw new RuntimeException("找不到logo图标！");
+        }
+        ImageIcon arrowIcon = new ImageIcon(url);
+        frame.setIconImage(arrowIcon.getImage());
     }
 }

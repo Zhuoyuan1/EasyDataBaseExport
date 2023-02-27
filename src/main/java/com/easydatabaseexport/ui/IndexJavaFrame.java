@@ -1,10 +1,12 @@
 package com.easydatabaseexport.ui;
 
 import com.easydatabaseexport.common.CommonConstant;
+import com.easydatabaseexport.common.PatternConstant;
 import com.easydatabaseexport.entities.ErrorMsg;
 import com.easydatabaseexport.entities.IndexConfig;
 import com.easydatabaseexport.enums.DataBaseType;
 import com.easydatabaseexport.log.LogManager;
+import com.easydatabaseexport.ui.component.ComboBoxRenderer;
 import com.easydatabaseexport.ui.component.IndexMenu;
 import com.easydatabaseexport.ui.component.IpPortJComboBox;
 import com.easydatabaseexport.ui.component.ThreadDiag;
@@ -46,11 +48,33 @@ public class IndexJavaFrame {
 
     private static final Vector<DataBaseType> DATA_BASE_TYPES = new Vector<>(Arrays.asList(DataBaseType.values()));
 
-    static final ImageIcon[] IMAGES = new ImageIcon[DATA_BASE_TYPES.size()];
+    private static final ImageIcon[] IMAGES = new ImageIcon[DATA_BASE_TYPES.size()];
+
+    /**
+     * 原始url
+     **/
+    private static String originUrlText;
+    /**
+     * 数据库
+     **/
+    private static String originDatabaseText;
+    /**
+     * 用户名
+     **/
+    private static String userText;
+    /**
+     * 密码
+     **/
+    private static String passwdText;
+
+    /**
+     * 用户选择索引
+     **/
+    private static int selectedIndex = 0;
 
     static {
         for (int i = 0; i < DATA_BASE_TYPES.size(); i++) {
-            IMAGES[i] = new ImageIcon(IndexJavaFrame.class.getResource("/images/" + DATA_BASE_TYPES.get(i).name().toLowerCase() + ".png"));
+            IMAGES[i] = new ImageIcon(Objects.requireNonNull(IndexJavaFrame.class.getResource("/images/" + DATA_BASE_TYPES.get(i).name().toLowerCase() + ".png")));
             if (IMAGES[i] != null) {
                 IMAGES[i].setDescription(DATA_BASE_TYPES.get(i).name());
             }
@@ -64,30 +88,32 @@ public class IndexJavaFrame {
 
         byte[] key = AESCoder.readFileReturnByte();
 
+        SwingUtils.changeLogo(jFrame);
+
         //数据库类型
         JComboBox<DataBaseType> dataBaseType = new JComboBox<DataBaseType>(DATA_BASE_TYPES);
-        ComboBoxRenderer renderer = new ComboBoxRenderer();
-        renderer.setPreferredSize(new Dimension(20, 29));
+        ComboBoxRenderer<DataBaseType> renderer = new ComboBoxRenderer<DataBaseType>(DATA_BASE_TYPES, IMAGES);
+        renderer.setPreferredSize(new Dimension(20, 27));
         dataBaseType.setRenderer(renderer);
-        dataBaseType.setPreferredSize(new Dimension(230, 24));
+        dataBaseType.setPreferredSize(new Dimension(230, 26));
 
         JLabel type = new JLabel("<html><span style='color:red'>*</span>数据库类型</html>");
 
         JLabel url = new JLabel("<html><span style='color:red'>*</span>连接地址【格式为ip:port】</html>");
 
         JLabel database = new JLabel("数据库");
-        JTextField databaseN = new JTextField(20);
-        databaseN.setPreferredSize(new Dimension(230, 24));
+        JTextField databaseN = new JTextField();
+        databaseN.setPreferredSize(new Dimension(230, 26));
         databaseN.setText("");
 
         JLabel username = new JLabel("<html><span style='color:red'>*</span>用户名</html>");
-        JTextField userN = new JTextField(20);
-        userN.setPreferredSize(new Dimension(230, 24));
+        JTextField userN = new JTextField();
+        userN.setPreferredSize(new Dimension(230, 26));
         userN.setText("root");
 
         JLabel passwd = new JLabel("密码");
-        JPasswordField passwdP = new JPasswordField(20);
-        passwdP.setPreferredSize(new Dimension(230, 24));
+        JPasswordField passwdP = new JPasswordField();
+        passwdP.setPreferredSize(new Dimension(230, 26));
         passwdP.setText("root");
 
         JCheckBox jcb = new JCheckBox("显示密码");
@@ -101,8 +127,8 @@ public class IndexJavaFrame {
         JPanel jPanel = new JPanel();
         jPanel.add(url);
         //如果 没有配置文件 则显示该输入框，如果有配置信息，则隐藏
-        JTextField urlN = new JTextField(20);
-        urlN.setPreferredSize(new Dimension(230, 24));
+        JTextField urlN = new JTextField();
+        urlN.setPreferredSize(new Dimension(230, 26));
         //判断是否读取配置文件
         if (configList.isEmpty()) {
             urlN.setText("127.0.0.1:3306");
@@ -116,7 +142,7 @@ public class IndexJavaFrame {
             Map<String, String> map = new LinkedHashMap<>();
             for (String config : configList) {
                 StringBuilder stringBuilder = new StringBuilder();
-                String[] strings = config.split("\\|");
+                String[] strings = config.split(PatternConstant.COMMON_SPLIT);
 
                 String ip;
                 String group = "";
@@ -152,20 +178,20 @@ public class IndexJavaFrame {
             }
             IpPortJComboBox jComboBox = new IpPortJComboBox(ipPort);
             //设置宽度
-            jComboBox.setPreferredSize(new Dimension(230, 24));
+            jComboBox.setPreferredSize(new Dimension(230, 26));
             // 添加条目选中状态改变的监听器
             jComboBox.addItemListener(e -> {
                 // 只处理选中的状态
                 if (Objects.isNull(jComboBox.getSelectedItem())) {
                     return;
                 }
-                urlN.setText(jComboBox.getSelectedItem().toString());
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     if (jComboBox.getSelectedItem() instanceof IndexConfig) {
+                        urlN.setText(jComboBox.getSelectedItem().toString());
                         String mapKey = ((IndexConfig) jComboBox.getSelectedItem()).toMyString();
                         String config = map.get(Objects.requireNonNull(mapKey));
                         if (!StringUtils.isNullOrEmpty(config)) {
-                            String[] strings = mapKey.split("\\|");
+                            String[] strings = mapKey.split(PatternConstant.COMMON_SPLIT);
                             databaseN.setText(strings[1]);
                             userN.setText(strings[2]);
                             if (strings.length == 4) {
@@ -183,8 +209,10 @@ public class IndexJavaFrame {
                     }
                 }
             });
-            jPanel.add(jComboBox);
+            //还原选择索引
+            jComboBox.setSelectedIndex(selectedIndex);
             jComboBox.setToolTipText(IP_PORT_TIPS);
+            jPanel.add(jComboBox);
         }
 
         JMenuBar menuBar = IndexMenu.IndexMenu(jFrame);
@@ -198,18 +226,25 @@ public class IndexJavaFrame {
         jPanel.add(passwd);
         jPanel.add(jcb);
         jPanel.add(passwdP);
-        jPanel.add(testBtn);
-        jPanel.add(confirmBtn);
+        final JSplitPane indexSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        JPanel btnPanel = new JPanel();
+        btnPanel.add(testBtn);
+        btnPanel.add(confirmBtn);
+        indexSplitPane.setDividerSize(0);
+        indexSplitPane.setResizeWeight(0.98);
+        indexSplitPane.setEnabled(true);
+        indexSplitPane.setTopComponent(jPanel);
+        indexSplitPane.setBottomComponent(btnPanel);
 
         final JSplitPane totalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         totalSplitPane.setTopComponent(menuBar);
-        totalSplitPane.setBottomComponent(jPanel);
+        totalSplitPane.setBottomComponent(indexSplitPane);
         //去除菜单和内容的分割线
         totalSplitPane.setDividerSize(0);
         totalSplitPane.setEnabled(true);
         jFrame.add(totalSplitPane);
 
-        jFrame.setSize(265, 380);
+        jFrame.setSize(265, 390);
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         jFrame.setResizable(false);
         //居中
@@ -217,13 +252,7 @@ public class IndexJavaFrame {
         jFrame.setVisible(true);
 
         ActionListener actionListenerRe = e -> {
-            String originUrlText = urlN.getText().trim();
-            String originDatabaseText = databaseN.getText().trim();
-            String userText = userN.getText().trim();
-            String passwdText = new String(passwdP.getPassword());
-            CommonConstant.DATA_BASE_TYPE = Objects.requireNonNull(dataBaseType.getSelectedItem()).toString();
-            ConnectDetector connectTest = new ConnectDetector(CommonConstant.DATA_BASE_TYPE);
-            Map<String, ErrorMsg> map = connectTest.connection(originUrlText, originDatabaseText, userText, passwdText, false);
+            Map<String, ErrorMsg> map = changeConnectParameter(jPanel, urlN, databaseN, userN, passwdP, dataBaseType, false);
 
             SwingUtilities.invokeLater(() -> {
                 if (map.containsKey(CommonConstant.SUCCESS)) {
@@ -242,13 +271,7 @@ public class IndexJavaFrame {
                 @SneakyThrows
                 @Override
                 public void run() {
-                    String originUrlText = urlN.getText().trim();
-                    String originDatabaseText = databaseN.getText().trim();
-                    String userText = userN.getText().trim();
-                    String passwdText = new String(passwdP.getPassword());
-                    CommonConstant.DATA_BASE_TYPE = Objects.requireNonNull(dataBaseType.getSelectedItem()).toString();
-                    ConnectDetector testConnect = new ConnectDetector(CommonConstant.DATA_BASE_TYPE);
-                    Map<String, ErrorMsg> map = testConnect.connection(originUrlText, originDatabaseText, userText, passwdText, true);
+                    Map<String, ErrorMsg> map = changeConnectParameter(jPanel, urlN, databaseN, userN, passwdP, dataBaseType, true);
                     if (map.containsKey(CommonConstant.SUCCESS)) {
                         jFrame.dispose();
                         String stringBuilder = originUrlText.replaceAll(CommonConstant.COLON, CommonConstant.SEPARATOR) + CommonConstant.SEPARATOR +
@@ -259,7 +282,6 @@ public class IndexJavaFrame {
                                 Base64.encodeBase64String(AESCoder.encrypt(passwdText.getBytes(), key));
                         FileOperateUtil.saveIniFile(FileOperateUtil.getSavePath() + "database.ini", stringBuilder);
                         //需要在swing线程中运行
-                        Thread.sleep(1000);
                         SwingUtilities.invokeLater(() -> {
                             ConnectJavaFrame javaFrame = new ConnectJavaFrame();
                             javaFrame.mainFrame();
@@ -299,48 +321,25 @@ public class IndexJavaFrame {
         CheckUpdateUtil.check();
     }
 
-
-    static class ComboBoxRenderer extends JLabel implements ListCellRenderer {
-        public ComboBoxRenderer() {
-            setOpaque(true);
-            setHorizontalAlignment(LEFT);
-            setVerticalAlignment(CENTER);
-        }
-
-        /*
-         * This method finds the image and text corresponding
-         * to the selected value and returns the label, set up
-         * to display the text and image.
-         */
-        @Override
-        public Component getListCellRendererComponent(
-                JList list,
-                Object value,
-                int index,
-                boolean isSelected,
-                boolean cellHasFocus) {
-            //Get the selected index. (The index param isn't
-            //always valid, so just use the value.)
-            int selectedIndex = DATA_BASE_TYPES.indexOf(DataBaseType.matchType(String.valueOf(value)));
-
-            if (isSelected) {
-                setBackground(list.getSelectionBackground());
-                setForeground(list.getSelectionForeground());
-            } else {
-                setBackground(list.getBackground());
-                setForeground(list.getForeground());
+    private static Map<String, ErrorMsg> changeConnectParameter(JPanel jPanel, JTextField urlN, JTextField databaseN,
+                                                                JTextField userN, JPasswordField passwdP, JComboBox<DataBaseType> dataBaseType, boolean confirm) {
+        Component component = jPanel.getComponent(1);
+        if (component instanceof JTextField) {
+            originUrlText = urlN.getText().trim();
+        } else {
+            IpPortJComboBox comboBox = (IpPortJComboBox) component;
+            if (confirm) {
+                selectedIndex = comboBox.getSelectedIndex();
             }
-
-            //Set the icon and text. If icon was null, say so.
-            ImageIcon icon = IMAGES[selectedIndex];
-            String iconName = String.valueOf(value);
-            setIcon(icon);
-            if (icon != null) {
-                setText(iconName);
-                setFont(list.getFont());
-            }
-            return this;
+            originUrlText = comboBox.getText().trim();
         }
+        originDatabaseText = databaseN.getText().trim();
+        userText = userN.getText().trim();
+        passwdText = new String(passwdP.getPassword());
+        CommonConstant.DATA_BASE_TYPE = Objects.requireNonNull(dataBaseType.getSelectedItem()).toString();
+        ConnectDetector connect = new ConnectDetector(CommonConstant.DATA_BASE_TYPE);
+        return connect.connection(originUrlText, originDatabaseText, userText, passwdText, confirm);
     }
+
 
 }

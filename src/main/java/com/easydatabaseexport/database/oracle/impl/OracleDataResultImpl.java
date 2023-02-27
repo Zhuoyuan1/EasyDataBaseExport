@@ -1,6 +1,5 @@
 package com.easydatabaseexport.database.oracle.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.easydatabaseexport.common.CommonConstant;
 import com.easydatabaseexport.common.CommonDataBaseType;
 import com.easydatabaseexport.core.DataResult;
@@ -444,14 +443,7 @@ public class OracleDataResultImpl extends AbstractDataResultImpl implements Data
         ConnectDetector.dataSource = DataSourceFactory.get(CommonConstant.DATA_BASE_TYPE);
         CommonConstant.connection = ConnectDetector.dataSource
                 .getCreateConnection(ConnectDetector.urlText, ConnectDetector.userText, ConnectDetector.passwdText);
-        PreparedStatement ppst = null;
-        ppst = CommonConstant.connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-        ResultSet rs = null;
-        for (int i = 1; i <= params.length; i++) {
-            ppst.setString(i, params[i - 1]);
-        }
-        rs = ppst.executeQuery();
-        return rs;
+        return super.getResultSetBySql(sql, params);
     }
 
     @SneakyThrows
@@ -461,19 +453,6 @@ public class OracleDataResultImpl extends AbstractDataResultImpl implements Data
         ConnectDetector.dataSource = DataSourceFactory.get(CommonConstant.DATA_BASE_TYPE);
         CommonConstant.connection = ConnectDetector.dataSource
                 .getCreateConnection(ConnectDetector.urlText, ConnectDetector.userText, ConnectDetector.passwdText);
-        PreparedStatement ppst = null;
-        List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
-        ppst = CommonConstant.connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-        ResultSet rs = ppst.executeQuery();
-        while (rs.next()) {
-            Map<String, String> resultMap = new HashMap<String, String>();
-            ResultSetMetaData metaData = rs.getMetaData();
-            int columnCount = metaData.getColumnCount();
-            for (int i = 1; i < columnCount + 1; i++) {
-                resultMap.put(metaData.getColumnName(i), rs.getString(i));
-            }
-            resultList.add(resultMap);
-        }
-        return (List<T>) JSON.parseArray(JSON.toJSONString(resultList), t.getClass());
+        return super.toList(t, sql);
     }
 }

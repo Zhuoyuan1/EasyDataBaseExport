@@ -466,17 +466,4 @@ public class XuguDataResultImpl extends AbstractDataResultImpl implements DataRe
         }
         return stringBuilder.toString();
     }
-
-    @Override
-    @SneakyThrows
-    public ResultSet getResultSetBySql(String sql, String... params) {
-        PreparedStatement ppst = null;
-        ppst = CommonConstant.connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-        ResultSet rs = null;
-        for (int i = 1; i <= params.length; i++) {
-            ppst.setString(i, params[i - 1]);
-        }
-        rs = ppst.executeQuery();
-        return rs;
-    }
 }

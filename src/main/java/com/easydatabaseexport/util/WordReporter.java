@@ -126,14 +126,14 @@ public class WordReporter {
                 List<TableParameter> exportList = parameterMap.getValue();
                 for (TableParameter tableParameter : exportList) {
                     Map<String, String> map = new HashMap<>();
-                    map.put("xuhao", tableParameter.getNo());
-                    map.put("a", tableParameter.getColumnName());
-                    map.put("b", tableParameter.getColumnType());
-                    map.put("c", tableParameter.getLength());
-                    map.put("d", tableParameter.getIsNullAble());
-                    map.put("e", tableParameter.getColumnDefault());
-                    map.put("f", tableParameter.getDecimalPlaces());
-                    map.put("g", tableParameter.getColumnComment());
+                    map.put("no", tableParameter.getNo());
+                    map.put("columnName", tableParameter.getColumnName());
+                    map.put("columnType", tableParameter.getColumnType());
+                    map.put("length", tableParameter.getLength());
+                    map.put("isNullAble", tableParameter.getIsNullAble());
+                    map.put("columnDefault", tableParameter.getColumnDefault());
+                    map.put("decimalPlaces", tableParameter.getDecimalPlaces());
+                    map.put("columnComment", tableParameter.getColumnComment());
                     list.add(map);
                 }
                 paramsValueMap.put("tableName" + index, parameterMap.getKey().split("---")[1]);
@@ -142,7 +142,7 @@ public class WordReporter {
                     List<IndexInfoVO> indexInfoVOList = indexMap.get(name);
                     for (int j = 0; j < indexInfoVOList.size(); j++) {
                         Map<String, String> map = new HashMap<>();
-                        map.put("xuhao", (j + 1) + "");
+                        map.put("no", (j + 1) + "");
                         map.put("name", indexInfoVOList.get(j).getName());
                         map.put("columnName", indexInfoVOList.get(j).getColumnName());
                         map.put("indexType", indexInfoVOList.get(j).getIndexType());
@@ -240,12 +240,12 @@ public class WordReporter {
     }
 
     private void changeTable(List<XWPFTable> tableList, List<Map<String, String>> list, int index) throws Exception {
-        //计xuhao 1 出现的次数
+        //计no 1 出现的次数
         int indexNumber = 0;
         XWPFTable table = null;
         List<XWPFTableRow> rows;
         for (int i = 0, len = list.size(); i < len; i++) {
-            if ("1".equals(list.get(i).get("xuhao")) && i > 0) {
+            if ("1".equals(list.get(i).get("no")) && i > 0) {
                 indexNumber++;
             }
             if (indexNumber >= 1) {
@@ -317,14 +317,14 @@ public class WordReporter {
                 List<TableParameter> exportList = parameterMap.getValue();
                 for (TableParameter tableParameter : exportList) {
                     Map<String, String> map = new HashMap<>();
-                    map.put("xuhao", tableParameter.getNo());
-                    map.put("a", tableParameter.getColumnName());
-                    map.put("b", tableParameter.getColumnType());
-                    map.put("c", tableParameter.getLength());
-                    map.put("d", tableParameter.getIsNullAble());
-                    map.put("e", tableParameter.getColumnDefault());
-                    map.put("f", tableParameter.getDecimalPlaces());
-                    map.put("g", tableParameter.getColumnComment());
+                    map.put("no", tableParameter.getNo());
+                    map.put("columnName", tableParameter.getColumnName());
+                    map.put("columnType", tableParameter.getColumnType());
+                    map.put("length", tableParameter.getLength());
+                    map.put("isNullAble", tableParameter.getIsNullAble());
+                    map.put("columnDefault", tableParameter.getColumnDefault());
+                    map.put("decimalPlaces", tableParameter.getDecimalPlaces());
+                    map.put("columnComment", tableParameter.getColumnComment());
                     list.add(map);
                 }
                 paramsValueMap.put("tableName" + index, parameterMap.getKey().split("---")[1]);
@@ -397,10 +397,10 @@ public class WordReporter {
         //替换段落变量
         replaceInPara(xwpfDocument, paramsValueMap);
 
-        //计xuhao 1 出现的次数
+        //计no 1 出现的次数
         int indexNum = 0;
         for (int i = 0, len = list.size(); i < len; i++) {
-            if ("1".equals(list.get(i).get("xuhao")) && i > 0) {
+            if ("1".equals(list.get(i).get("no")) && i > 0) {
                 indexNum++;
             }
             if (indexNum >= 1) {
@@ -476,10 +476,10 @@ public class WordReporter {
     }
 
     private void setDataToTable(List<Map<String, String>> list, XWPFTable table, int j) throws Exception {
-        //计xuhao 1 出现的次数
+        //计no 1 出现的次数
         int index = 0;
         for (int i = 0, len = list.size(); i < len; i++) {
-            if ("1".equals(list.get(i).get("xuhao")) && i > 0) {
+            if ("1".equals(list.get(i).get("no")) && i > 0) {
                 index++;
             }
             if (index != j) {

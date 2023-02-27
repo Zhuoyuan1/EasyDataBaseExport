@@ -3,9 +3,7 @@ package com.easydatabaseexport.ui.component;
 import com.easydatabaseexport.util.OpenUrl;
 import lombok.SneakyThrows;
 
-import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.event.MouseAdapter;
@@ -59,14 +57,5 @@ public class LinkLabel extends JLabel {
         } else {
             setText("<html><font color=red><u>" + text);
         }
-    }
-
-    public static void main(String[] args) {
-        JFrame jf = new JFrame();
-        JPanel jp = new JPanel();
-        jp.add(new LinkLabel("百度一下", "https://www.baidu.com"));
-        jf.setContentPane(jp);
-        jf.pack();
-        jf.setVisible(true);
     }
 }

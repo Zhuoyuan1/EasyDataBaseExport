@@ -20,6 +20,8 @@ public class IpPortJComboBox extends JComboBox<IndexConfig> {
     private DefaultComboBoxModel<IndexConfig> initComboBoxModel = null;
     private final JComboBox<IndexConfig> thisComboBox = this;
     private Vector<IndexConfig> content = null;
+    //记录输入索引位置
+    private static int index = 0;
 
 
     public IpPortJComboBox(Vector<IndexConfig> items) {
@@ -38,22 +40,20 @@ public class IpPortJComboBox extends JComboBox<IndexConfig> {
     }
 
     private void setMatchKey(boolean isAction, char c) {
-        String target = getText().trim();
+        StringBuilder str = new StringBuilder(getText().trim());
+        StringBuilder str2 = new StringBuilder(getText().trim());
         //由于keyListen监听的是键盘输入时，就执行，因此JTextField并没有被赋新的值
+        index = comboBoxTextField.getCaretPosition();
         //这里匹配做了拼接
-        if (!isAction && target.length() > 0) {
-            target += String.valueOf(c);
+        if (!isAction) {
+            str2.insert(index, c);
         }
-        if ("".equals(target.trim())) {
+        if ("".equals(str.toString())) {
             recoverModel();
         } else {
-            setItems(getMatchKey(target));
+            setItems(getMatchKey(str2.toString()));
         }
-        //在这里进行删除操作，不然会赋值两遍
-        if (!isAction && target.length() > 0) {
-            target = target.substring(0, target.length() - 1);
-        }
-        refresh(target);
+        refresh(str.toString());
     }
 
     private void openMatchKey() {
@@ -127,6 +127,7 @@ public class IpPortJComboBox extends JComboBox<IndexConfig> {
     private void refresh(String text) {
         this.setSelectedIndex(-1);
         comboBoxTextField.setText(text);
+        comboBoxTextField.setCaretPosition(index);
     }
 
 }

@@ -3,8 +3,9 @@ package com.easydatabaseexport.ui.export;
 import com.easydatabaseexport.common.CommonConstant;
 import com.easydatabaseexport.entities.IndexInfoVO;
 import com.easydatabaseexport.entities.TableParameter;
-import com.easydatabaseexport.ui.AbstractActionListener;
 import com.easydatabaseexport.ui.component.JCheckBoxTree;
+import com.easydatabaseexport.ui.export.config.ExportFileType;
+import com.itextpdf.io.font.PdfEncodings;
 import com.itextpdf.io.font.otf.GlyphLine;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
@@ -28,6 +29,7 @@ import lombok.SneakyThrows;
 
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -46,17 +48,9 @@ public class PdfActionListener extends AbstractActionListener implements ActionL
         super.suffix = ExportFileType.PDF.getSuffix();
     }
 
-    /**
-     * 表结构和表索引数据组装
-     **/
-    @Override
-    public boolean dataAssemble() {
-        return dataAssembleAndJudge(root);
-    }
-
     @SneakyThrows
     @Override
-    public void export(File file) {
+    public boolean export(File file) {
         Map<String, List<Map.Entry<String, List<TableParameter>>>> allMap = listMap.entrySet()
                 .stream().collect(Collectors.groupingBy(v -> v.getKey().split("---")[0]));
         PdfWriter pdfWriter = new PdfWriter(file);
@@ -69,7 +63,13 @@ public class PdfActionListener extends AbstractActionListener implements ActionL
                 return true;//解决word-break: break-all;不兼容的问题，解决纯英文或数字不自动换行的问题
             }
         });
-        PdfFont font = PdfFontFactory.createFont("STSong-Light", "UniGB-UCS2-H", pdf);
+        URL url = PdfActionListener.class.getClassLoader().getResource("simsun.ttc");
+        if (null == url) {
+            throw new Exception("字体初始化失败！");
+        }
+        /** 为什么是 ,1 呢？ 请查看关键代码 => int ttcSplit = baseName.toLowerCase().indexOf(".ttc,");
+         * @see com.itextpdf.io.font.FontProgramFactory#createFont(String, boolean) */
+        PdfFont font = PdfFontFactory.createFont(url.toExternalForm() + ",1", PdfEncodings.IDENTITY_H, pdf);
         //设置文档属性
         pdf.getDocumentInfo().setAuthor("像风一样");
         pdf.getDocumentInfo().setTitle("EasyDatabaseExport");
@@ -87,7 +87,7 @@ public class PdfActionListener extends AbstractActionListener implements ActionL
             for (Map.Entry<String, List<TableParameter>> parameterMap : myMap.getValue()) {
                 //表名
                 String tableName = parameterMap.getKey().split("---")[1];
-                Paragraph tableParagraph = new Paragraph(tableName).setFont(font);
+                Paragraph tableParagraph = new Paragraph(tableName).setFont(font).setBold();
                 outline = createOutline(outline, pdf, tableName, tableParagraph);
                 document.add(tableParagraph);
                 //索引Table
@@ -96,8 +96,12 @@ public class PdfActionListener extends AbstractActionListener implements ActionL
                     process(table, CommonConstant.INDEX_HEAD_NAMES, font, true);
                     String name = parameterMap.getKey().split("\\[")[0];
                     List<IndexInfoVO> indexInfoVOList = indexMap.get(name);
-                    for (int j = 0; j < indexInfoVOList.size(); j++) {
-                        process(table, getIndexValues(indexInfoVOList.get(j)), font, false);
+                    if (!indexInfoVOList.isEmpty()) {
+                        for (IndexInfoVO indexInfoVO : indexInfoVOList) {
+                            process(table, getIndexValues(indexInfoVO), font, false);
+                        }
+                    } else {
+                        process(table, getIndexValues(new IndexInfoVO()), font, false);
                     }
                     document.add(table);
                 }
@@ -107,8 +111,8 @@ public class PdfActionListener extends AbstractActionListener implements ActionL
                 Table table = new Table(CommonConstant.COLUMN_HEAD_NAMES.length);
                 //标题、内容
                 process(table, CommonConstant.COLUMN_HEAD_NAMES, font, true);
-                for (int i = 0; i < exportList.size(); i++) {
-                    process(table, getColumnValues((i + 1) + "", exportList.get(i)), font, false);
+                for (TableParameter tableParameter : exportList) {
+                    process(table, getColumnValues(tableParameter), font, false);
                 }
                 document.add(table);
                 //分页
@@ -118,6 +122,7 @@ public class PdfActionListener extends AbstractActionListener implements ActionL
         //删除最后一页
         pdf.removePage(pdf.getLastPage());
         document.close();
+        return Boolean.TRUE;
     }
 
     public PdfOutline createOutline(PdfOutline outline, PdfDocument pdf, String title, Paragraph p) {
@@ -131,7 +136,9 @@ public class PdfActionListener extends AbstractActionListener implements ActionL
         return outline;
     }
 
-    //设置表格内容
+    /**
+     * 设置表格内容
+     */
     public static <T> void process(Table table, T[] line, PdfFont font, boolean isHeader) {
         for (T s : line) {
             if (Objects.isNull(s)) {
@@ -139,7 +146,7 @@ public class PdfActionListener extends AbstractActionListener implements ActionL
             }
             Cell cell = new Cell().add(new Paragraph(s.toString()).setFont(font));
             if (isHeader) {
-                table.addHeaderCell(cell);
+                table.addHeaderCell(cell.setBold());
             } else {
                 table.addCell(cell);
             }

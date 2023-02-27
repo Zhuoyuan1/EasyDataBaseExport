@@ -8,7 +8,8 @@ package com.easydatabaseexport.enums;
  **/
 public enum UpdateEnum {
     //索引
-    UPDATE_VERSION("update", "是否自动检查更新");
+    UPDATE_VERSION("update", "是否自动检查更新"),
+    VERSIONS("update_ignore", "忽略的所有版本");
 
     private final String key;
     private final String value;

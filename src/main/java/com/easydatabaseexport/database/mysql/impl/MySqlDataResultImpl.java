@@ -50,19 +50,9 @@ public class MySqlDataResultImpl extends AbstractDataResultImpl implements DataR
 
     @Override
     public JScrollPane getDataCenterInfo(int width, int height) throws SQLException {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("use ");
-        stringBuilder.append("`").append(CommonConstant.DATABASE_NAME).append("`");
         String sql = "select * from `" + CommonConstant.DATABASE_NAME + "`.`" + CommonConstant.TABLE_NAME + "`";
-
         PreparedStatement ppst = null;
         ResultSet rs = null;
-
-        //首先执行选库操作
-        if (!StringUtils.isNullOrEmpty(CommonConstant.DATABASE_NAME)) {
-            ppst = CommonConstant.connection.prepareStatement(stringBuilder.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-            ppst.executeQuery();
-        }
 
         ppst = CommonConstant.connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
         rs = ppst.executeQuery();
@@ -186,7 +176,7 @@ public class MySqlDataResultImpl extends AbstractDataResultImpl implements DataR
     public Map<String, ErrorMsg> checkExist(String tableName, String dataBase) throws Exception {
         String sql = "SHOW CREATE TABLE `" + dataBase + "`.`" + tableName + "`";
         ResultSet rs = null;
-        Map<String, ErrorMsg> map = new HashMap<>(0);
+        Map<String, ErrorMsg> map = new HashMap<>(16);
         ErrorMsg msg = new ErrorMsg();
         try {
             PreparedStatement ppst = CommonConstant.connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);

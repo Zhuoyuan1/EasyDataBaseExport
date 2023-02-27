@@ -48,8 +48,10 @@ public class UploadSynFrame {
 
     private static DecodeNcx decodeNcx;
 
-    public void UpLoadFile(JFrame mainFrame) {
+    public void upLoadFile(JFrame mainFrame) {
         JFrame jframe = new JFrame("导入连接向导");
+        SwingUtils.changeLogo(jframe);
+        jframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         jframe.setLayout(new BorderLayout());
         JToolBar jToolBar = new JToolBar();
         jframe.setSize(400, 150);

@@ -95,33 +95,27 @@ public class FileOperateUtil {
      * 调用系统命令 打开文件
      *
      * @param file
-     * @return boolean
      * @author lzy
      * @date 2021/5/31 15:30
      **/
-    public static boolean open(File file) {
+    public static void open(File file) {
         try {
             if (OSDetector.isWindows()) {
                 Runtime.getRuntime().exec(new String[]
                         {"rundll32", "url.dll,FileProtocolHandler",
                                 file.getAbsolutePath()});
-                return true;
             } else if (OSDetector.isLinux() || OSDetector.isMac()) {
                 Runtime.getRuntime().exec(new String[]{"/usr/bin/open",
                         file.getAbsolutePath()});
-                return true;
             } else {
                 // Unknown OS, try with desktop
                 if (Desktop.isDesktopSupported()) {
                     Desktop.getDesktop().open(file);
-                    return true;
                 } else {
-                    return false;
                 }
             }
         } catch (Exception e) {
             e.printStackTrace(System.err);
-            return false;
         }
     }
 
@@ -137,7 +131,7 @@ public class FileOperateUtil {
         File file = new File(path);
         if (file.exists()) {
         } else {
-            InputStream inputStream = EasyDataBaseExportMain.class.getClassLoader().getResourceAsStream("template.ini");
+            InputStream inputStream = EasyDataBaseExportMain.class.getClassLoader().getResourceAsStream("database.ini");
             // 如果是resource目录下可以直接写文件名称
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             byte[] buffer = new byte[4096];
@@ -166,12 +160,10 @@ public class FileOperateUtil {
     public static void writeData(String address, String keyword, String childKey, String msg) {
         try {
             if ("sys".equals(keyword)) {
-                Config cfg = new Config();
+                Config cfg = FileIniRead.getDefaultConfig();
                 // 生成配置文件的URL
                 File iniFile = new File(address);
                 URL url = iniFile.toURI().toURL();
-                // 设置Section允许出现重复
-                cfg.setMultiSection(true);
                 Ini ini = new Ini();
                 ini.setConfig(cfg);
                 try {
@@ -186,12 +178,10 @@ public class FileOperateUtil {
                     e.printStackTrace();
                 }
             } else {
-                Config cfg = new Config();
+                Config cfg = FileIniRead.getDefaultConfig();
                 // 生成配置文件的URL
                 File iniFile = new File(address);
                 URL url = iniFile.toURI().toURL();
-                // 设置Section允许出现重复
-                cfg.setMultiSection(true);
                 Ini ini = new Ini();
                 ini.setConfig(cfg);
                 try {
@@ -220,12 +210,10 @@ public class FileOperateUtil {
      */
     public static void writeNewData(String address, String parentKey, String key, String value) {
         try {
-            Config cfg = new Config();
+            Config cfg = FileIniRead.getDefaultConfig();
             // 生成配置文件的URL
             File iniFile = new File(address);
             URL url = iniFile.toURI().toURL();
-            // 设置Section允许出现重复
-            cfg.setMultiSection(true);
             Ini ini = new Ini();
             ini.setConfig(cfg);
             // 加载配置文件
@@ -261,11 +249,11 @@ public class FileOperateUtil {
         return md5;
     }
 
-    public static String getRemoteFileMD5() {
+    public static String getRemoteFile(String urlText) {
         HttpURLConnection connection = null;
         StringBuilder retStr = new StringBuilder();
         try {
-            URL url = new URL("https://gitee.com/lzy549876/EasyDataBaseExport/raw/main/MD5.txt");
+            URL url = new URL(urlText);
             connection = (HttpURLConnection) url.openConnection();
             connection.setConnectTimeout(3000);
             connection.setDoOutput(true);
@@ -293,9 +281,9 @@ public class FileOperateUtil {
     }
 
     /*public static void main(String[] args) {
-        writeData("E:\\MySQLTools-main\\src\\main\\resources\\template.ini", "sys", "1111=1");
-        writeData("E:\\MySQLTools-main\\src\\main\\resources\\template.ini", "theme", "1");
-        writeData("E:\\MySQLTools-main\\src\\main\\resources\\template.ini", "theme", "2");
+        writeData("E:\\MySQLTools-main\\src\\main\\resources\\database.ini", "sys", "1111=1");
+        writeData("E:\\MySQLTools-main\\src\\main\\resources\\database.ini", "theme", "1");
+        writeData("E:\\MySQLTools-main\\src\\main\\resources\\database.ini", "theme", "2");
         System.out.println(getLocalMd5File("C:\\Users\\Administrator\\Desktop\\MySQLToWordOrExcel\\target\\EasyDataBaseExport-0.0.1-SNAPSHOT-jar-with-dependencies.jar"));
     }*/
 }

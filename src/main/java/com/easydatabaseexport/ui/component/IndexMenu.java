@@ -1,7 +1,7 @@
 package com.easydatabaseexport.ui.component;
 
+import com.easydatabaseexport.ui.EditUrlFrame;
 import com.easydatabaseexport.ui.UploadSynFrame;
-import com.easydatabaseexport.util.CheckUpdateUtil;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -30,16 +30,17 @@ public class IndexMenu {
         JMenu fileMenu = new JMenu("操作");
         // 一级菜单添加到菜单栏
         menuBar.add(fileMenu);
+        CustomMenu.addAboutBar(menuBar);
 
         /*
          * 创建 "文件" 一级菜单的子菜单
          */
         JMenuItem importNv = new JMenuItem("导入连接...");
-        JMenuItem updateItem = new JMenuItem("检查更新");
+        JMenuItem editNv = new JMenuItem("编辑连接...");
         JMenuItem exitMenuItem = new JMenuItem("退出");
 
         fileMenu.add(importNv);
-        fileMenu.add(updateItem);
+        fileMenu.add(editNv);
         fileMenu.addSeparator();       // 添加一条分割线
         fileMenu.add(exitMenuItem);
         // 设置 "退出" 子菜单被点击的监听器
@@ -49,11 +50,16 @@ public class IndexMenu {
                 System.exit(0);
             }
         });
+        //导出连接
         importNv.addActionListener(e -> {
             UploadSynFrame uploadSynFrame = new UploadSynFrame();
-            uploadSynFrame.UpLoadFile(mainJFrame);
+            uploadSynFrame.upLoadFile(mainJFrame);
         });
-        updateItem.addActionListener(e -> CheckUpdateUtil.checkByClick());
+        //编辑连接
+        editNv.addActionListener(e -> {
+            EditUrlFrame editUrlFrame = new EditUrlFrame();
+            editUrlFrame.edit(mainJFrame);
+        });
         return menuBar;
 
     }

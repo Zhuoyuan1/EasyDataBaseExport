@@ -21,7 +21,7 @@ public class DataBaseAssemblyFactory {
     /**
      * DataBase实现类缓存池
      */
-    private static final Map<String, DataBaseAssembly> REPORT_POOL = new ConcurrentHashMap<>(0);
+    private static final Map<String, DataBaseAssembly> REPORT_POOL = new ConcurrentHashMap<>(16);
 
     static {
         // [连接-库-表]

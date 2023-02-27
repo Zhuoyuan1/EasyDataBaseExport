@@ -3,10 +3,13 @@ package com.easydatabaseexport.ui.component;
 import com.easydatabaseexport.common.CommonConstant;
 import com.easydatabaseexport.factory.DataBaseAssemblyFactory;
 import com.easydatabaseexport.factory.assembly.DataBaseAssembly;
+import com.easydatabaseexport.factory.assembly.impl.ConDatabaseModeTableImpl;
+import javafx.util.Pair;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTree;
@@ -23,6 +26,7 @@ import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Enumeration;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
@@ -33,7 +37,7 @@ import java.util.Objects;
  * @date 2021/3/20 21:18
  **/
 public class JCheckBoxTree extends JTree {
-    /*public static void main(String[] args) {
+    public static void main(String[] args) {
         CheckNode root = new CheckNode("Root");
         CheckNode child1 = new CheckNode("child1");
         CheckNode child2 = new CheckNode("child2");
@@ -47,7 +51,7 @@ public class JCheckBoxTree extends JTree {
         frame.setVisible(true);
         frame.setSize(300, 400);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    }*/
+    }
 
     private static final long serialVersionUID = 1L;
 
@@ -99,6 +103,135 @@ public class JCheckBoxTree extends JTree {
         });
     }
 
+    public static Pair<JCheckBoxTree, CheckNode> searchTree(CheckNode root, String key) {
+        Enumeration<DefaultMutableTreeNode> e = root.breadthFirstEnumeration();
+        CheckNode rootNode = new CheckNode(CommonConstant.ROOT);
+        DefaultMutableTreeNode node = e.nextElement();
+        if (node.getLevel() == 0) {
+            if (node.toString().contains(key)) {
+                return new Pair<>(new JCheckBoxTree(root), root);
+            }
+        }
+        if (DataBaseAssemblyFactory.get(CommonConstant.DATA_BASE_TYPE) instanceof ConDatabaseModeTableImpl) {
+            //查找 (连接 -> 数据库 -> 模式 -> 表) 名称是否匹配上
+            Enumeration<DefaultMutableTreeNode> enumeration = node.children();
+            while (enumeration.hasMoreElements()) {
+                DefaultMutableTreeNode database = enumeration.nextElement();
+                CheckNode newDataBase = new CheckNode(database.toString());
+                if (database.toString().contains(key)) {
+                    rootNode.add(newDataBase);
+                    Enumeration<DefaultMutableTreeNode> patterns = database.children();
+                    while (patterns.hasMoreElements()) {
+                        DefaultMutableTreeNode pattern = patterns.nextElement();
+                        if (pattern.toString().contains(key)) {
+                            CheckNode newPattern = new CheckNode(pattern.toString());
+                            newDataBase.add(newPattern);
+                            Enumeration<DefaultMutableTreeNode> tables = pattern.children();
+                            while (tables.hasMoreElements()) {
+                                DefaultMutableTreeNode table = tables.nextElement();
+                                CheckNode newTable = new CheckNode(table.toString());
+                                newPattern.add(newTable);
+                            }
+                        } else {
+                            Enumeration<DefaultMutableTreeNode> tables = pattern.children();
+                            List<String> list = new LinkedList<>();
+                            while (tables.hasMoreElements()) {
+                                DefaultMutableTreeNode table = tables.nextElement();
+                                if (table.toString().contains(key)) {
+                                    list.add(table.toString());
+                                }
+                            }
+                            if (list.size() > 0) {
+                                CheckNode newPattern = new CheckNode(pattern.toString());
+                                list.forEach(v -> {
+                                    newPattern.add(new CheckNode(v));
+                                });
+                                newDataBase.add(newPattern);
+                            }
+                        }
+                    }
+                } else {
+                    Enumeration<DefaultMutableTreeNode> patterns = database.children();
+                    while (patterns.hasMoreElements()) {
+                        DefaultMutableTreeNode pattern = patterns.nextElement();
+                        if (pattern.toString().contains(key)) {
+                            CheckNode newPattern = new CheckNode(pattern.toString());
+                            newDataBase.add(newPattern);
+                            rootNode.add(newDataBase);
+                            Enumeration<DefaultMutableTreeNode> tables = pattern.children();
+                            while (tables.hasMoreElements()) {
+                                DefaultMutableTreeNode table = tables.nextElement();
+                                if (table.toString().contains(key)) {
+                                    CheckNode newTable = new CheckNode(table.toString());
+                                    newPattern.add(newTable);
+                                }
+                            }
+                        } else {
+                            Enumeration<DefaultMutableTreeNode> tables = pattern.children();
+                            List<String> list = new LinkedList<>();
+                            while (tables.hasMoreElements()) {
+                                DefaultMutableTreeNode table = tables.nextElement();
+                                if (table.toString().contains(key)) {
+                                    list.add(table.toString());
+                                }
+                            }
+                            if (list.size() > 0) {
+                                CheckNode newPattern = new CheckNode(pattern.toString());
+                                list.forEach(v -> {
+                                    newPattern.add(new CheckNode(v));
+                                });
+                                newDataBase.add(newPattern);
+                                rootNode.add(newDataBase);
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            //查找数据库名称是否匹配上
+            getChildCheckNode(rootNode, key, root);
+        }
+        return new Pair<>(new JCheckBoxTree(rootNode), rootNode);
+    }
+
+    private static void getChildCheckNode(CheckNode result, String key, CheckNode target) {
+        //查找数据库名称是否匹配上
+        Enumeration<DefaultMutableTreeNode> enumeration = target.children();
+        while (enumeration.hasMoreElements()) {
+            DefaultMutableTreeNode database = enumeration.nextElement();
+            //不匹配就删除
+            CheckNode newDataBase = new CheckNode(database.toString());
+            if (database.toString().contains(key)) {
+                result.add(newDataBase);
+                Enumeration<DefaultMutableTreeNode> children = database.children();
+                while (children.hasMoreElements()) {
+                    DefaultMutableTreeNode table = children.nextElement();
+                    if (table.toString().contains(key)) {
+                        CheckNode newTable = new CheckNode(table.toString());
+                        newDataBase.add(newTable);
+                    }
+                }
+            } else {
+                //如果数据库没有匹配到key，则搜索表
+                Enumeration<DefaultMutableTreeNode> children = database.children();
+                List<String> list = new LinkedList<>();
+                while (children.hasMoreElements()) {
+                    DefaultMutableTreeNode table = children.nextElement();
+                    if (table.toString().contains(key)) {
+                        list.add(table.toString());
+                    }
+                }
+                if (list.size() > 0) {
+                    result.add(newDataBase);
+                    list.forEach(v -> {
+                        newDataBase.add(new CheckNode(v));
+                    });
+                }
+            }
+        }
+    }
+
+
     private class CheckRenderer extends JPanel implements TreeCellRenderer {
         private static final long serialVersionUID = 1L;
 
@@ -109,7 +242,7 @@ public class JCheckBoxTree extends JTree {
         public CheckRenderer() {
             setLayout(null);
             add(check = new JCheckBox());
-            check.setBackground(UIManager.getColor("Tree.textBackground"));
+            check.setBackground(Color.WHITE);
             add(label = new TreeLabel());
             label.setForeground(UIManager.getColor("Tree.textForeground"));
         }
@@ -130,7 +263,7 @@ public class JCheckBoxTree extends JTree {
             label.setFocus(hasFocus);
             DataBaseAssembly dataBaseAssembly = DataBaseAssemblyFactory.get(CommonConstant.DATA_BASE_TYPE);
             List<ImageIcon> list = dataBaseAssembly.image();
-            if (leaf && ((CheckNode) value).getParent().getParent() != null) {
+            if (leaf && (((CheckNode) value).getParent() != null) && ((CheckNode) value).getParent().getParent() != null) {
                 label.setIcon(list.size() == 4 ? list.get(3) : list.get(2));
             } else if (((CheckNode) value).isRoot()) {
                 label.setIcon(list.get(0));

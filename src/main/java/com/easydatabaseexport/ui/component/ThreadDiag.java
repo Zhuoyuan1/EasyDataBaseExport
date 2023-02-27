@@ -1,5 +1,6 @@
 package com.easydatabaseexport.ui.component;
 
+import com.easydatabaseexport.util.SwingUtils;
 import lombok.SneakyThrows;
 
 import javax.swing.JDialog;
@@ -40,6 +41,7 @@ public class ThreadDiag extends Thread {
         this.parentFrame = parentFrame;
         this.currentThread = currentThread;
         this.messages = messages;
+        SwingUtils.changeLogo(parentFrame);
         //初始化提示框
         initDiag();
     }
@@ -47,6 +49,8 @@ public class ThreadDiag extends Thread {
     protected void initDiag() {
         clueDiag = new JDialog(parentFrame, null, true);
         clueDiag.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+        //关闭按钮失效
+        clueDiag.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         URL wait = ThreadDiag.class.getResource("/images/wait.gif");
         Image image = Toolkit.getDefaultToolkit().getImage(wait);
 
@@ -69,6 +73,7 @@ public class ThreadDiag extends Thread {
     public void run() {
         //显示提示框
         clueDiag.setSize(new Dimension(200, 80));
+        clueDiag.setResizable(false);
         clueDiag.setLocationRelativeTo(null);
         clueDiag.setUndecorated(true);
         clueDiag.setVisible(true);

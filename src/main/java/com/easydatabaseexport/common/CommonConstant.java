@@ -5,6 +5,7 @@ import com.easydatabaseexport.enums.ConfigEnum;
 import com.easydatabaseexport.enums.DataBaseType;
 import com.easydatabaseexport.enums.UpdateEnum;
 import com.easydatabaseexport.log.LogManager;
+import com.easydatabaseexport.ui.ConnectJavaFrame;
 import com.easydatabaseexport.ui.component.JCheckBoxTree;
 import com.easydatabaseexport.util.FileIniRead;
 import com.easydatabaseexport.util.FileOperateUtil;
@@ -12,7 +13,9 @@ import com.easydatabaseexport.util.StringUtil;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 
-import javax.swing.*;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.UIManager;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -20,7 +23,6 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,7 +35,7 @@ import java.util.regex.Pattern;
  * @date 2021/11/1 14:51
  **/
 @Log
-public class CommonConstant {
+public final class CommonConstant {
 
     public static final String IP_PORT = "^(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])" +
             "\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5]):([0-9]|[1-9]" +
@@ -68,9 +70,16 @@ public class CommonConstant {
     /**
      * 表head
      **/
-    public static final String[] INDEX_HEAD_NAMES =
+    public static String[] INDEX_HEAD_NAMES =
             {"名称", "字段", "索引类型", "索引方法", "注释"};
-    public static final String[] COLUMN_HEAD_NAMES =
+    public static String[] COLUMN_HEAD_NAMES =
+            {"序号", "字段名", "类型", "长度", "是否为空", "默认值", "小数位", "注释"};
+    /**
+     * 不变的表头用于展示 和 配置选择
+     **/
+    public static final String[] INDEX_FINAL_HEAD_NAMES =
+            {"名称", "字段", "索引类型", "索引方法", "注释"};
+    public static final String[] COLUMN_FINAL_HEAD_NAMES =
             {"序号", "字段名", "类型", "长度", "是否为空", "默认值", "小数位", "注释"};
     /**
      * 表名
@@ -92,11 +101,11 @@ public class CommonConstant {
     /**
      * frame的宽
      */
-    public static int FRAME_WIDTH = 1500;
+    public static final int FRAME_WIDTH = 1500;
     /**
      * frame的高
      */
-    public static int FRAME_HEIGHT = 800;
+    public static final int FRAME_HEIGHT = 800;
 
     public static Connection connection = null;
     public static JCheckBoxTree root;
@@ -116,7 +125,7 @@ public class CommonConstant {
     /**
      * 导出配置
      */
-    public static Map<String, String> configMap = new ConcurrentHashMap<>(0);
+    public static Map<String, String> configMap = new ConcurrentHashMap<>(16);
     public static final String INI_NODE_KEY = "config";
     public static final String EXPORT = "export";
     public static final String UPDATE = "update";
@@ -145,14 +154,17 @@ public class CommonConstant {
         if (UPDATE.equals(key)) {
             for (UpdateEnum updateEnum : UpdateEnum.values()) {
                 if (!configMap.containsKey(updateEnum.getKey())) {
-                    writeNewKey(updateEnum.getKey(), "1");
+                    if (updateEnum.getKey().equals(UpdateEnum.UPDATE_VERSION.getKey())) {
+                        writeNewKey(updateEnum.getKey(), "1");
+                    }
                 }
             }
         } else if (EXPORT.equals(key)) {
             for (ConfigEnum configEnum : ConfigEnum.values()) {
                 if (!configMap.containsKey(configEnum.getKey())) {
                     if (configEnum.getKey().equals(ConfigEnum.TABLE_HEAD.getKey()) ||
-                            configEnum.getKey().equals(ConfigEnum.INDEX_TABLE_HEAD.getKey())) {
+                            configEnum.getKey().equals(ConfigEnum.INDEX_TABLE_HEAD.getKey()) ||
+                            configEnum.getKey().equals(ConfigEnum.DEFAULT_EXPORT_PATH.getKey())) {
                         writeNewKey(configEnum.getKey(), configEnum.getValue());
                     } else {
                         writeNewKey(configEnum.getKey(), null);
@@ -177,6 +189,7 @@ public class CommonConstant {
         CommonDataBaseType.CON_DATABASE_TABLE_MAP.clear();
         CommonDataBaseType.CON_MODE_TABLE_MAP.clear();
         CommonDataBaseType.CON_DATABASE_MODE_TABLE_MAP.clear();
+        ConnectJavaFrame.cacheRootNode = null;
         TABLE_NAME = "";
         DATABASE_NAME = "";
         TREE_DATABASE = "";
@@ -206,35 +219,49 @@ public class CommonConstant {
             file.mkdir();
         }
         for (int i = 0; i < EnvironmentConstant.TEMPLATE_FILE.size(); i++) {
-            FileOutputStream outputStream = null;
-            InputStream inputStream = null;
-            try {
-                outputStream = new FileOutputStream(template + File.separator + EnvironmentConstant.TEMPLATE_FILE.get(i));
-                // 模板文件输入输出地址 读取resources下文件
-                //返回读取指定资源的输入流
-                inputStream = CommonConstant.class.getClassLoader().getResourceAsStream(EnvironmentConstant.TEMPLATE_FILE.get(i));
-                byte[] buffer = new byte[4096];
-                int n = 0;
-                while (-1 != (n = inputStream.read(buffer))) {
-                    outputStream.write(buffer, 0, n);
+            saveFile(template, EnvironmentConstant.TEMPLATE_FILE.get(i), true);
+        }
+    }
+
+    public static void copySystemIniFile() {
+        saveFile(FileOperateUtil.getSavePath(), "database.ini", false);
+    }
+
+    public static void saveFile(String dir, String path, boolean isOverride) {
+        FileOutputStream outputStream = null;
+        InputStream inputStream = null;
+        if (!isOverride) {
+            File file = new File(dir + File.separator + path);
+            if (file.exists()) {
+                return;
+            }
+        }
+        try {
+            outputStream = new FileOutputStream(dir + File.separator + path);
+            // 模板文件输入输出地址 读取resources下文件
+            //返回读取指定资源的输入流
+            inputStream = CommonConstant.class.getClassLoader().getResourceAsStream(path);
+            byte[] buffer = new byte[4096];
+            int n = 0;
+            while (-1 != (n = inputStream.read(buffer))) {
+                outputStream.write(buffer, 0, n);
+            }
+            outputStream.flush();
+        } catch (Exception ex) {
+            LogManager.writeLogFile(ex, log);
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException ex) {
+                    LogManager.writeLogFile(ex, log);
                 }
-                outputStream.flush();
-            } catch (Exception ex) {
-                LogManager.writeLogFile(ex, log);
-            } finally {
-                if (inputStream != null) {
-                    try {
-                        inputStream.close();
-                    } catch (IOException ex) {
-                        LogManager.writeLogFile(ex, log);
-                    }
-                }
-                if (outputStream != null) {
-                    try {
-                        outputStream.close();
-                    } catch (IOException ex) {
-                        LogManager.writeLogFile(ex, log);
-                    }
+            }
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException ex) {
+                    LogManager.writeLogFile(ex, log);
                 }
             }
         }

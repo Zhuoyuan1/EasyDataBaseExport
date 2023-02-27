@@ -28,8 +28,6 @@ public class AESCoder {
         Security.setProperty("crypto.policy", "unlimited");
     }
 
-    private static final String string = "THpZMTg3cndldW9makAjISg=";
-
     /**
      * 密钥算法
      */
@@ -54,8 +52,7 @@ public class AESCoder {
      */
     private static Key toKey(byte[] key) {
         // 实例化DES密钥材料
-        SecretKey secretKey = new SecretKeySpec(key, KEY_ALGORITHM);
-        return secretKey;
+        return new SecretKeySpec(key, KEY_ALGORITHM);
     }
 
     /**

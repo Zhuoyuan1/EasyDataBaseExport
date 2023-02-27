@@ -3,8 +3,9 @@ package com.easydatabaseexport.ui.export;
 import com.easydatabaseexport.common.PatternConstant;
 import com.easydatabaseexport.entities.IndexInfoVO;
 import com.easydatabaseexport.entities.TableParameter;
-import com.easydatabaseexport.ui.AbstractActionListener;
 import com.easydatabaseexport.ui.component.JCheckBoxTree;
+import com.easydatabaseexport.ui.export.config.ExportFileType;
+import com.easydatabaseexport.util.StringUtil;
 import lombok.SneakyThrows;
 
 import java.awt.event.ActionListener;
@@ -33,7 +34,7 @@ public class MarkdownActionListener extends AbstractActionListener implements Ac
 
     @SneakyThrows
     @Override
-    public void export(File markdownFile) {
+    public boolean export(File markdownFile) {
         Map<String, List<Map.Entry<String, List<TableParameter>>>> allMap = listMap.entrySet()
                 .stream().collect(Collectors.groupingBy(v -> v.getKey().split("---")[0]));
         try (BufferedWriter fileWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(markdownFile, true), StandardCharsets.UTF_8.name()))) {
@@ -56,8 +57,13 @@ public class MarkdownActionListener extends AbstractActionListener implements Ac
                         writeLineSeparator(fileWriter, 1);
                         String name = parameterMap.getKey().split("\\[")[0];
                         List<IndexInfoVO> indexInfoVOList = indexMap.get(name);
-                        for (int j = 0; j < indexInfoVOList.size(); j++) {
-                            fileWriter.write(String.format(PatternConstant.INDEX_TABLE_BODY, getIndexValues(indexInfoVOList.get(j))));
+                        if (!indexInfoVOList.isEmpty()) {
+                            for (IndexInfoVO indexInfoVO : indexInfoVOList) {
+                                fileWriter.write(String.format(PatternConstant.INDEX_TABLE_BODY, getIndexValues(indexInfoVO)));
+                                writeLineSeparator(fileWriter, 1);
+                            }
+                        } else {
+                            fileWriter.write(String.format(PatternConstant.INDEX_TABLE_BODY, getIndexValues(new IndexInfoVO())));
                             writeLineSeparator(fileWriter, 1);
                         }
                         writeLineSeparator(fileWriter, 1);
@@ -69,14 +75,15 @@ public class MarkdownActionListener extends AbstractActionListener implements Ac
                     writeLineSeparator(fileWriter, 1);
                     //字段Table
                     List<TableParameter> exportList = parameterMap.getValue();
-                    for (int i = 0; i < exportList.size(); i++) {
-                        fileWriter.write(String.format(PatternConstant.TABLE_BODY, getColumnValues((i + 1) + "", exportList.get(i))));
+                    for (TableParameter tableParameter : exportList) {
+                        fileWriter.write(String.format(PatternConstant.TABLE_BODY, getColumnValues(tableParameter)));
                         writeLineSeparator(fileWriter, 1);
                     }
                     writeLineSeparator(fileWriter, 2);
                 }
             }
         }
+        return Boolean.TRUE;
     }
 
     private void writeLineSeparator(BufferedWriter fileWriter, int number) throws IOException {
@@ -85,11 +92,8 @@ public class MarkdownActionListener extends AbstractActionListener implements Ac
         }
     }
 
-    /**
-     * 表结构和表索引数据组装
-     **/
     @Override
-    public boolean dataAssemble() {
-        return dataAssembleAndJudge(root);
+    public String dealWith(String source) {
+        return StringUtil.stringEqualHtml(source);
     }
 }

@@ -552,19 +552,6 @@ public class SqlServerDataResultImpl extends AbstractDataResultImpl implements D
         return stringBuilder.toString();
     }
 
-    @Override
-    @SneakyThrows
-    public ResultSet getResultSetBySql(String sql, String... params) {
-        PreparedStatement ppst = null;
-        ppst = CommonConstant.connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-        ResultSet rs = null;
-        for (int i = 1; i <= params.length; i++) {
-            ppst.setString(i, params[i - 1]);
-        }
-        rs = ppst.executeQuery();
-        return rs;
-    }
-
     @SneakyThrows
     @Override
     public void doListValueChanged() {
@@ -575,19 +562,7 @@ public class SqlServerDataResultImpl extends AbstractDataResultImpl implements D
                 .prepareStatement(stringBuilder, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
         ppst.execute();
 
-        CommonConstant.RIGHT.removeAll();
-        JTabbedPane jPanel = getRightInfo(CommonConstant.RIGHT.getWidth(), CommonConstant.RIGHT.getHeight());
-        CommonConstant.RIGHT.add(jPanel);
-        CommonConstant.RIGHT.validate();
-        CommonConstant.RIGHT.repaint();
-
-        initList();
-        CommonConstant.CENTERS.removeAll();
-        JScrollPane jTable = getCenterInfo(CommonConstant.tableParameterList);
-        jTable.setSize(CommonConstant.CENTERS.getWidth(), CommonConstant.CENTERS.getHeight());
-        CommonConstant.CENTERS.add(jTable);
-        CommonConstant.CENTERS.validate();
-        CommonConstant.CENTERS.repaint();
+        super.doListValueChanged();
     }
 
 }

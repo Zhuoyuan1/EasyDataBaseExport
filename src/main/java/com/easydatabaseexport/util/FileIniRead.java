@@ -28,21 +28,17 @@ public class FileIniRead {
      * 用户配置读取
      *
      * @return java.util.List<java.lang.String>
-     * @author lzy
-     * @date 2021/7/6 9:32
      **/
     public static List<String> getIniConf() {
         List<String> list = new ArrayList<>();
         try {
-            Config cfg = new Config();
+            Config cfg = getDefaultConfig();
             // 生成配置文件的URL
             File iniFile = new File(FileOperateUtil.getSavePath() + FILE_NAME);
             if (!iniFile.exists()) {
                 return list;
             }
             URL url = iniFile.toURI().toURL();
-            // 设置Section允许出现重复
-            cfg.setMultiSection(true);
             Ini ini = new Ini();
             ini.setConfig(cfg);
             // 加载配置文件
@@ -61,6 +57,64 @@ public class FileIniRead {
     }
 
     /**
+     * 用户配置[sys] 删除
+     **/
+    public static void deleteIniConf(List<String> keys) {
+        try {
+            Config cfg = getDefaultConfig();
+            // 生成配置文件的URL
+            File iniFile = new File(FileOperateUtil.getSavePath() + FILE_NAME);
+            if (!iniFile.exists()) {
+                return;
+            }
+            URL url = iniFile.toURI().toURL();
+            Ini ini = new Ini();
+            ini.setConfig(cfg);
+            // 加载配置文件
+            ini.load(url);
+            // 读取 system
+            List<Profile.Section> sectionList = ini.getAll("sys");
+            for (Profile.Section section : sectionList) {
+                for (String key : section.keySet()) {
+                    if (keys.contains(key)) {
+                        //删除
+                        section.put(key, null);
+                        ini.store(iniFile);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LogManager.writeLogFile(e, log);
+        }
+    }
+
+    /**
+     * 用户配置[sys] 插入
+     **/
+    public static void insertIniConf(Map<String, String> allKeysMap) {
+        try {
+            File iniFile = new File(FileOperateUtil.getSavePath() + FILE_NAME);
+            if (!iniFile.exists()) {
+                return;
+            }
+            Config cfg = FileIniRead.getDefaultConfig();
+            URL url = iniFile.toURI().toURL();
+            Ini ini = new Ini();
+            ini.setConfig(cfg);
+            // 加载配置文件
+            ini.load(url);
+            for (Map.Entry<String, String> map : allKeysMap.entrySet()) {
+                //读取 system
+                Profile.Section section = ini.get("sys");
+                section.put(map.getKey(), map.getValue());
+            }
+            ini.store(iniFile);
+        } catch (Exception e) {
+            LogManager.writeLogFile(e, log);
+        }
+    }
+
+    /**
      * 主题读取
      *
      * @return java.lang.String
@@ -69,15 +123,13 @@ public class FileIniRead {
      **/
     public static String getIniThemeIndex() {
         try {
-            Config cfg = new Config();
+            Config cfg = getDefaultConfig();
             // 生成配置文件的URL
             File iniFile = new File(FileOperateUtil.getSavePath() + FILE_NAME);
             if (!iniFile.exists()) {
                 return "-1";
             }
             URL url = iniFile.toURI().toURL();
-            // 设置Section允许出现重复
-            cfg.setMultiSection(true);
             Ini ini = new Ini();
             ini.setConfig(cfg);
             // 加载配置文件
@@ -100,15 +152,13 @@ public class FileIniRead {
     public static Map<String, String> getConfig(String name) {
         Map<String, String> map = new HashMap<>(0);
         try {
-            Config cfg = new Config();
+            Config cfg = getDefaultConfig();
             // 生成配置文件的URL
             File iniFile = new File(FileOperateUtil.getSavePath() + FILE_NAME);
             if (!iniFile.exists()) {
                 return map;
             }
             URL url = iniFile.toURI().toURL();
-            // 设置Section允许出现重复
-            cfg.setMultiSection(true);
             Ini ini = new Ini();
             ini.setConfig(cfg);
             // 加载配置文件
@@ -124,6 +174,15 @@ public class FileIniRead {
             return map;
         }
         return map;
+    }
+
+    public static Config getDefaultConfig() {
+        Config cfg = new Config();
+        // 设置Section允许出现重复
+        cfg.setMultiSection(true);
+        // 允许空的Section
+        cfg.setEmptySection(true);
+        return cfg;
     }
 
     /*public static void main(String[] args) {

@@ -13,15 +13,17 @@ import java.util.Iterator;
  **/
 public class StringUtil {
 
+    private static final String EMPTY_STR = "null";
+
     public static String StringEqual(String str) {
-        if (StringUtils.isNullOrEmpty(str)) {
+        if (StringUtils.isNullOrEmpty(str) || EMPTY_STR.equals(str)) {
             return "--";
         }
         return str;
     }
 
     public static String stringNullForEmpty(String str) {
-        if (StringUtils.isNullOrEmpty(str)) {
+        if (StringUtils.isNullOrEmpty(str) || EMPTY_STR.equals(str)) {
             return "";
         }
         return str;
@@ -45,8 +47,8 @@ public class StringUtil {
         return cs == null || cs.length() == 0;
     }
 
-    public static Object stringEqualHtml(String str) {
-        if (StringUtils.isNullOrEmpty(str)) {
+    public static String stringEqualHtml(String str) {
+        if (StringUtils.isNullOrEmpty(str) || EMPTY_STR.equals(str)) {
             return "<br>";
         }
         return str;

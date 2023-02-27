@@ -1,11 +1,13 @@
 package com.easydatabaseexport;
 
 import com.easydatabaseexport.common.CommonConstant;
+import com.easydatabaseexport.common.PatternConstant;
 import com.easydatabaseexport.exception.ExceptionHandler;
 import com.easydatabaseexport.log.LogManager;
 import com.easydatabaseexport.ui.IndexJavaFrame;
 import com.easydatabaseexport.util.AESCoder;
 import com.easydatabaseexport.util.FileIniRead;
+import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 
 import javax.swing.JDialog;
@@ -25,10 +27,14 @@ public class EasyDataBaseExportMain {
     static {
         try {
             AESCoder.initKeyAndEndurance();
-            //检查ini配置
-            CommonConstant.checkConfigIniFile();
+            //初始化ini文件
+            CommonConstant.copySystemIniFile();
             //生成模板文件
             CommonConstant.copyTemplateFile();
+            //检查ini配置
+            CommonConstant.checkConfigIniFile();
+            //改变参数
+            PatternConstant.reCheckConfig();
         } catch (Exception e) {
             LogManager.writeLogFile(e, log);
         }
@@ -37,10 +43,13 @@ public class EasyDataBaseExportMain {
     /**
      * 程序入口
      **/
+    @SneakyThrows
     public static void main(String[] args) {
         //允许修改JFrame的标题栏
         JFrame.setDefaultLookAndFeelDecorated(true);
         JDialog.setDefaultLookAndFeelDecorated(true);
+        //启用跨平台的外观
+        UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         //读取配置文件哦
         CommonConstant.index = Integer.parseInt(FileIniRead.getIniThemeIndex());
         SwingUtilities.invokeLater(() -> {

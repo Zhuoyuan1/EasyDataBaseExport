@@ -26,7 +26,7 @@ public class DataBaseFactory {
     /**
      * DataBase实现类缓存池
      */
-    private static final Map<String, DataResult> REPORT_POOL = new ConcurrentHashMap<>(0);
+    private static final Map<String, DataResult> REPORT_POOL = new ConcurrentHashMap<>(16);
 
     static {
         REPORT_POOL.put(DataBaseType.MYSQL.name(), new MySqlDataResultImpl());

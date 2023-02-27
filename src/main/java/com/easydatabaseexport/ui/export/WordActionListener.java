@@ -2,9 +2,8 @@ package com.easydatabaseexport.ui.export;
 
 import com.easydatabaseexport.common.CommonConstant;
 import com.easydatabaseexport.common.EnvironmentConstant;
-import com.easydatabaseexport.factory.DataBaseAssemblyFactory;
-import com.easydatabaseexport.ui.AbstractActionListener;
 import com.easydatabaseexport.ui.component.JCheckBoxTree;
+import com.easydatabaseexport.ui.export.config.ExportFileType;
 import com.easydatabaseexport.util.AddToTopic;
 import com.easydatabaseexport.util.FileOperateUtil;
 import com.easydatabaseexport.util.WordReporter;
@@ -12,10 +11,8 @@ import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 
-import javax.swing.JOptionPane;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.Enumeration;
 
 /**
  * WordActionListener
@@ -24,6 +21,7 @@ import java.util.Enumeration;
  * @date 2022/11/10 9:34
  **/
 @Log
+@Deprecated
 public class WordActionListener extends AbstractActionListener implements ActionListener {
 
     public WordActionListener(final JCheckBoxTree.CheckNode root) {
@@ -32,19 +30,11 @@ public class WordActionListener extends AbstractActionListener implements Action
     }
 
     /**
-     * 表结构和表索引数据组装
-     **/
-    @Override
-    public boolean dataAssemble() {
-        return dataAssembleAndJudge(root);
-    }
-
-    /**
      * Word导出
      **/
     @SneakyThrows
     @Override
-    public void export(File file) {
+    public boolean export(File file) {
         String filePath = FileOperateUtil.getSavePath() + CommonConstant.templateDir + File.separator;
         if (indexMap.size() > 0) {
             filePath += EnvironmentConstant.TEMPLATE_FILE.get(0);
@@ -58,6 +48,7 @@ public class WordActionListener extends AbstractActionListener implements Action
         XWPFDocument document = wordReporter.generate(file.getAbsolutePath());
         //添加目录
         AddToTopic.generateTOC(document, file.getAbsolutePath());
+        return Boolean.TRUE;
     }
 
 }

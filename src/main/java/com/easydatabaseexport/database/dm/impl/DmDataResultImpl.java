@@ -449,7 +449,6 @@ public class DmDataResultImpl extends AbstractDataResultImpl implements DataResu
         CommonConstant.RIGHT.removeAll();
         JTabbedPane jPanel = getRightInfo(CommonConstant.RIGHT.getWidth(), CommonConstant.RIGHT.getHeight());
         CommonConstant.RIGHT.add(jPanel);
-        //CommonConstant.RIGHT.setLayout(new FlowLayout(FlowLayout.LEFT));
         CommonConstant.RIGHT.validate();
         CommonConstant.RIGHT.repaint();
 
