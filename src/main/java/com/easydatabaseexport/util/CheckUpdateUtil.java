@@ -5,7 +5,6 @@ import com.easydatabaseexport.common.EnvironmentConstant;
 import com.easydatabaseexport.enums.UpdateEnum;
 import com.easydatabaseexport.enums.YesNoEnum;
 import com.easydatabaseexport.ui.UpdateVersionFrame;
-import com.microsoft.sqlserver.jdbc.StringUtils;
 
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -20,7 +19,7 @@ import java.util.Objects;
  **/
 public class CheckUpdateUtil {
 
-    private static final String MD5_URL = "https://gitee.com/lzy549876/EasyDataBaseExport/raw/main/MD5.txt";
+    private static final String UPDATE_URL = "https://gitee.com/lzy549876/EasyDataBaseExport/raw/main/MD5.txt";
 
     /**
      * 自动检查更新
@@ -34,8 +33,8 @@ public class CheckUpdateUtil {
             }
         }
         //请求当前最新版本
-        String result = FileOperateUtil.getRemoteFile(MD5_URL);
-        if (StringUtils.isEmpty(result)) {
+        String result = FileOperateUtil.getRemoteFile(UPDATE_URL);
+        if (StringUtil.isEmpty(result)) {
             return;
         }
         //忽略当前版本
@@ -46,7 +45,7 @@ public class CheckUpdateUtil {
             }
         }
         //若版本md5不同，则跳出更新
-        if (!EnvironmentConstant.FILE_MD5_VALUE.equals(result)) {
+        if (!EnvironmentConstant.VERSION.equals(result)) {
             UpdateVersionFrame updateVersion = new UpdateVersionFrame();
             updateVersion.updateVersionFrame(result);
         }
@@ -57,11 +56,11 @@ public class CheckUpdateUtil {
      **/
     public static void checkByClick() {
         //判断软件更新逻辑
-        String result = FileOperateUtil.getRemoteFile(MD5_URL);
-        if (StringUtils.isEmpty(result)) {
+        String result = FileOperateUtil.getRemoteFile(UPDATE_URL);
+        if (StringUtil.isEmpty(result)) {
             return;
         }
-        if (!EnvironmentConstant.FILE_MD5_VALUE.equals(result)) {
+        if (!EnvironmentConstant.VERSION.equals(result)) {
             UpdateVersionFrame updateVersion = new UpdateVersionFrame();
             updateVersion.updateVersionFrame(result);
         } else {

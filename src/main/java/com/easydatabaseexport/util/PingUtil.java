@@ -1,7 +1,7 @@
 package com.easydatabaseexport.util;
 
 import com.easydatabaseexport.log.LogManager;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
  * @author lzy
  * @date 2021/5/31 15:44
  **/
-@Log
+@Log4j
 public class PingUtil {
 
     public static final String LINUX = "Linux";

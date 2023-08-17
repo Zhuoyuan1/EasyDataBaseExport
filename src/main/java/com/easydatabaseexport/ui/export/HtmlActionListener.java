@@ -100,7 +100,7 @@ public class HtmlActionListener extends AbstractActionListener implements Action
 
         str = str.replace("${data}", htmlText).replace("${catalogue}", catalogue);
 
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true), StandardCharsets.UTF_8.name()));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true), StandardCharsets.UTF_8));
         writer.write(str);
         writer.close();
         inputStream.close();

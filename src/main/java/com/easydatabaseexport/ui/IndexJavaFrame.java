@@ -4,6 +4,7 @@ import com.easydatabaseexport.common.CommonConstant;
 import com.easydatabaseexport.common.PatternConstant;
 import com.easydatabaseexport.entities.ErrorMsg;
 import com.easydatabaseexport.entities.IndexConfig;
+import com.easydatabaseexport.entities.OSDetector;
 import com.easydatabaseexport.enums.DataBaseType;
 import com.easydatabaseexport.log.LogManager;
 import com.easydatabaseexport.ui.component.ComboBoxRenderer;
@@ -15,10 +16,10 @@ import com.easydatabaseexport.util.AESCoder;
 import com.easydatabaseexport.util.CheckUpdateUtil;
 import com.easydatabaseexport.util.FileIniRead;
 import com.easydatabaseexport.util.FileOperateUtil;
+import com.easydatabaseexport.util.StringUtil;
 import com.easydatabaseexport.util.SwingUtils;
-import com.mysql.cj.util.StringUtils;
 import lombok.SneakyThrows;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 import org.apache.commons.codec.binary.Base64;
 
 import javax.swing.*;
@@ -26,6 +27,8 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -40,7 +43,7 @@ import java.util.Vector;
  * @author lzy
  * @date 2021/11/1 15:03
  **/
-@Log
+@Log4j
 public class IndexJavaFrame {
 
     private static final String IP_PORT_TIPS = "<html>请填写ip（域名）和端口。<br/>① ip+端口格式：x.x.x.x:xxx（例：192.168.0.1:3306） " +
@@ -66,11 +69,18 @@ public class IndexJavaFrame {
      * 密码
      **/
     private static String passwdText;
-
     /**
      * 用户选择索引
      **/
     private static int selectedIndex = 0;
+    /**
+     * 输入框宽度
+     **/
+    private static final int WIDTH = 230;
+    /**
+     * 输入框高度
+     **/
+    private static final int HEIGHT = 26;
 
     static {
         for (int i = 0; i < DATA_BASE_TYPES.size(); i++) {
@@ -95,7 +105,7 @@ public class IndexJavaFrame {
         ComboBoxRenderer<DataBaseType> renderer = new ComboBoxRenderer<DataBaseType>(DATA_BASE_TYPES, IMAGES);
         renderer.setPreferredSize(new Dimension(20, 27));
         dataBaseType.setRenderer(renderer);
-        dataBaseType.setPreferredSize(new Dimension(230, 26));
+        dataBaseType.setPreferredSize(new Dimension(WIDTH, HEIGHT));
 
         JLabel type = new JLabel("<html><span style='color:red'>*</span>数据库类型</html>");
 
@@ -103,17 +113,17 @@ public class IndexJavaFrame {
 
         JLabel database = new JLabel("数据库");
         JTextField databaseN = new JTextField();
-        databaseN.setPreferredSize(new Dimension(230, 26));
+        databaseN.setPreferredSize(new Dimension(WIDTH, HEIGHT));
         databaseN.setText("");
 
         JLabel username = new JLabel("<html><span style='color:red'>*</span>用户名</html>");
         JTextField userN = new JTextField();
-        userN.setPreferredSize(new Dimension(230, 26));
+        userN.setPreferredSize(new Dimension(WIDTH, HEIGHT));
         userN.setText("root");
 
         JLabel passwd = new JLabel("密码");
         JPasswordField passwdP = new JPasswordField();
-        passwdP.setPreferredSize(new Dimension(230, 26));
+        passwdP.setPreferredSize(new Dimension(WIDTH, HEIGHT));
         passwdP.setText("root");
 
         JCheckBox jcb = new JCheckBox("显示密码");
@@ -128,7 +138,7 @@ public class IndexJavaFrame {
         jPanel.add(url);
         //如果 没有配置文件 则显示该输入框，如果有配置信息，则隐藏
         JTextField urlN = new JTextField();
-        urlN.setPreferredSize(new Dimension(230, 26));
+        urlN.setPreferredSize(new Dimension(WIDTH, HEIGHT));
         //判断是否读取配置文件
         if (configList.isEmpty()) {
             urlN.setText("127.0.0.1:3306");
@@ -146,10 +156,15 @@ public class IndexJavaFrame {
 
                 String ip;
                 String group = "";
+                boolean isSqlite = (OSDetector.isMac() || OSDetector.isLinux()) && strings[3].equals(DataBaseType.SQLITE.name());
                 if (strings[0].contains("/")) {
-                    String[] names = strings[0].split("/");
-                    group = names[0];
-                    ip = names[1];
+                    if (isSqlite) {
+                        ip = strings[0];
+                    } else {
+                        String[] names = strings[0].split("/");
+                        group = names[0];
+                        ip = names[1];
+                    }
                 } else {
                     ip = strings[0];
                 }
@@ -158,9 +173,17 @@ public class IndexJavaFrame {
                     map.put(stringBuilder.toString(), strings[5]);
                     ipPort.add(new IndexConfig(ip + CommonConstant.COLON + strings[1], strings[2], strings[3], strings[4], strings[5], group));
                 } else {
-                    stringBuilder.append(strings[0]).append(CommonConstant.COLON).append(strings[1]).append(CommonConstant.SEPARATOR).append(strings[2]).append(CommonConstant.SEPARATOR).append(strings[3]);
-                    map.put(stringBuilder.toString(), strings[4]);
-                    ipPort.add(new IndexConfig(ip + CommonConstant.COLON + strings[1], strings[2], strings[3], "", strings[4], group));
+                    if (isSqlite) {
+                        stringBuilder.append(strings[0]).append(CommonConstant.SEPARATOR).append(strings[1]).append(CommonConstant.SEPARATOR)
+                                .append(strings[2]).append(CommonConstant.SEPARATOR).append(strings[3]);
+                        map.put(stringBuilder.toString(), strings[4]);
+                        ipPort.add(new IndexConfig(ip, strings[1], strings[2], strings[3], strings[4], group, true));
+                    } else {
+                        stringBuilder.append(strings[0]).append(CommonConstant.COLON).append(strings[1]).append(CommonConstant.SEPARATOR)
+                                .append(strings[2]).append(CommonConstant.SEPARATOR).append(strings[3]);
+                        map.put(stringBuilder.toString(), strings[4]);
+                        ipPort.add(new IndexConfig(ip + CommonConstant.COLON + strings[1], strings[2], strings[3], "", strings[4], group));
+                    }
                 }
                 if (i == 0) {
                     urlN.setText(ip + CommonConstant.COLON + strings[1]);
@@ -178,7 +201,7 @@ public class IndexJavaFrame {
             }
             IpPortJComboBox jComboBox = new IpPortJComboBox(ipPort);
             //设置宽度
-            jComboBox.setPreferredSize(new Dimension(230, 26));
+            jComboBox.setPreferredSize(new Dimension(WIDTH, HEIGHT));
             // 添加条目选中状态改变的监听器
             jComboBox.addItemListener(e -> {
                 // 只处理选中的状态
@@ -190,7 +213,7 @@ public class IndexJavaFrame {
                         urlN.setText(jComboBox.getSelectedItem().toString());
                         String mapKey = ((IndexConfig) jComboBox.getSelectedItem()).toMyString();
                         String config = map.get(Objects.requireNonNull(mapKey));
-                        if (!StringUtils.isNullOrEmpty(config)) {
+                        if (!StringUtil.isEmpty(config)) {
                             String[] strings = mapKey.split(PatternConstant.COMMON_SPLIT);
                             databaseN.setText(strings[1]);
                             userN.setText(strings[2]);
@@ -231,7 +254,8 @@ public class IndexJavaFrame {
         btnPanel.add(testBtn);
         btnPanel.add(confirmBtn);
         indexSplitPane.setDividerSize(0);
-        indexSplitPane.setResizeWeight(0.98);
+        indexSplitPane.setDividerLocation(280);
+        indexSplitPane.setOneTouchExpandable(false);
         indexSplitPane.setEnabled(true);
         indexSplitPane.setTopComponent(jPanel);
         indexSplitPane.setBottomComponent(btnPanel);
@@ -242,14 +266,6 @@ public class IndexJavaFrame {
         //去除菜单和内容的分割线
         totalSplitPane.setDividerSize(0);
         totalSplitPane.setEnabled(true);
-        jFrame.add(totalSplitPane);
-
-        jFrame.setSize(265, 390);
-        jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        jFrame.setResizable(false);
-        //居中
-        jFrame.setLocationRelativeTo(null);
-        jFrame.setVisible(true);
 
         ActionListener actionListenerRe = e -> {
             Map<String, ErrorMsg> map = changeConnectParameter(jPanel, urlN, databaseN, userN, passwdP, dataBaseType, false);
@@ -314,8 +330,40 @@ public class IndexJavaFrame {
 
         urlN.setToolTipText(IP_PORT_TIPS);
         databaseN.setToolTipText("<html>请填写数据库。<br/>*** MySQL、SQLite非必填<br/>*** Oracle填写对应Navicat的服务名<html/>");
+        userN.setToolTipText("<html>请填写用户名。<br/>*** SQLite非必填<html/>");
         ToolTipManager.sharedInstance().setInitialDelay(0);
         ToolTipManager.sharedInstance().setDismissDelay(5000);
+
+        jFrame.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                int resizeWidth = WIDTH;
+                if (265 != jFrame.getWidth() || jFrame.getHeight() != 390) {
+                    resizeWidth = jFrame.getWidth() - 30;
+                }
+                for (Component component : jPanel.getComponents()) {
+                    if (component instanceof JTextField) {
+                        JTextField jTextField = (JTextField) component;
+                        jTextField.setPreferredSize(new Dimension(resizeWidth, HEIGHT));
+                    } else if (component instanceof JComboBox) {
+                        JComboBox jComboBox = (JComboBox) component;
+                        jComboBox.setPreferredSize(new Dimension(resizeWidth, HEIGHT));
+                    }
+                }
+                indexSplitPane.setDividerLocation(jFrame.getHeight() - 110);
+                btnPanel.setSize(251, 51);
+            }
+        });
+
+        jFrame.add(totalSplitPane);
+
+        jFrame.setSize(265, 390);
+        jFrame.setMinimumSize(new Dimension(265, 390));
+        jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        jFrame.setResizable(true);
+        //居中
+        jFrame.setLocationRelativeTo(null);
+        jFrame.setVisible(true);
 
         //检查更新
         CheckUpdateUtil.check();

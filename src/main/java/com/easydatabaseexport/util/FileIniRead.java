@@ -1,7 +1,8 @@
 package com.easydatabaseexport.util;
 
+import com.easydatabaseexport.enums.ConfigKeyEnum;
 import com.easydatabaseexport.log.LogManager;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 import org.ini4j.Config;
 import org.ini4j.Ini;
 import org.ini4j.Profile;
@@ -19,7 +20,7 @@ import java.util.Map;
  * @author lzy
  * @date 2021/7/5 21:19
  **/
-@Log
+@Log4j
 public class FileIniRead {
 
     public final static String FILE_NAME = "database.ini";
@@ -44,7 +45,7 @@ public class FileIniRead {
             // 加载配置文件
             ini.load(url);
             // 读取 system
-            List<Profile.Section> sectionList = ini.getAll("sys");
+            List<Profile.Section> sectionList = ini.getAll(ConfigKeyEnum.SYS.getKey());
             for (Profile.Section section : sectionList) {
                 for (String key : section.keySet()) {
                     list.add(key + "|" + section.get(key));
@@ -59,7 +60,7 @@ public class FileIniRead {
     /**
      * 用户配置[sys] 删除
      **/
-    public static void deleteIniConf(List<String> keys) {
+    public static void deleteIniConf(String configKey, List<String> keys) {
         try {
             Config cfg = getDefaultConfig();
             // 生成配置文件的URL
@@ -73,7 +74,7 @@ public class FileIniRead {
             // 加载配置文件
             ini.load(url);
             // 读取 system
-            List<Profile.Section> sectionList = ini.getAll("sys");
+            List<Profile.Section> sectionList = ini.getAll(configKey);
             for (Profile.Section section : sectionList) {
                 for (String key : section.keySet()) {
                     if (keys.contains(key)) {
@@ -105,7 +106,7 @@ public class FileIniRead {
             ini.load(url);
             for (Map.Entry<String, String> map : allKeysMap.entrySet()) {
                 //读取 system
-                Profile.Section section = ini.get("sys");
+                Profile.Section section = ini.get(ConfigKeyEnum.SYS.getKey());
                 section.put(map.getKey(), map.getValue());
             }
             ini.store(iniFile);

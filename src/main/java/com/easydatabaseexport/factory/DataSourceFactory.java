@@ -7,6 +7,7 @@ import com.easydatabaseexport.database.kingbase.config.KingBaseDataV8Source;
 import com.easydatabaseexport.database.mysql.config.MySqlDataSource;
 import com.easydatabaseexport.database.oracle.config.OracleDataSource;
 import com.easydatabaseexport.database.postgresql.config.PostgreSqlDataSource;
+import com.easydatabaseexport.database.sqlite.config.SqliteDataSource;
 import com.easydatabaseexport.database.sqlserver.config.SqlServerDataSource;
 import com.easydatabaseexport.database.xugu.config.XuguDataSource;
 import com.easydatabaseexport.enums.DataBaseType;
@@ -32,6 +33,7 @@ public class DataSourceFactory {
         REPORT_POOL.put(DataBaseType.MYSQL.name(), new MySqlDataSource());
         REPORT_POOL.put(DataBaseType.ORACLE.name(), new OracleDataSource());
         REPORT_POOL.put(DataBaseType.SQLSERVER.name(), new SqlServerDataSource());
+        REPORT_POOL.put(DataBaseType.SQLITE.name(), new SqliteDataSource());
         REPORT_POOL.put(DataBaseType.POSTGRESQL.name(), new PostgreSqlDataSource());
         REPORT_POOL.put(DataBaseType.DB2.name(), new Db2DataSource());
         REPORT_POOL.put(DataBaseType.DM.name(), new DmDataSource());

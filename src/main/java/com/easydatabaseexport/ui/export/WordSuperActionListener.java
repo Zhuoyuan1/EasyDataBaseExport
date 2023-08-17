@@ -14,7 +14,7 @@ import com.easydatabaseexport.ui.export.config.ExportFileType;
 import com.easydatabaseexport.util.AddToTopic;
 import com.easydatabaseexport.util.FileOperateUtil;
 import lombok.SneakyThrows;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  * @author lzy
  * @date 2022/11/24 15:03
  **/
-@Log
+@Log4j
 public class WordSuperActionListener extends AbstractActionListener implements ActionListener {
 
     public WordSuperActionListener(final JCheckBoxTree.CheckNode root) {

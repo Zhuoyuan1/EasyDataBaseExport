@@ -26,7 +26,7 @@ public interface DataResult {
      * @param tableName 表名
      * @param dataBase  数据库名
      * @return java.lang.String
-     * @throws SQLException
+     * @throws SQLException sql异常
      **/
     String getTableInfoAndStructureByClick(String tableName, String dataBase) throws SQLException;
 
@@ -36,7 +36,7 @@ public interface DataResult {
      * @param width  宽
      * @param height 高
      * @return javax.swing.JScrollPane
-     * @throws SQLException
+     * @throws SQLException sql异常
      **/
     JScrollPane getDataCenterInfo(int width, int height) throws SQLException;
 
@@ -51,8 +51,6 @@ public interface DataResult {
 
     /**
      * 初始化
-     *
-     * @return void
      **/
     void initList();
 
@@ -62,7 +60,7 @@ public interface DataResult {
      * @param databaseName 库名
      * @param tableName    表名
      * @return List<TableParameter>
-     * @throws Exception
+     * @throws Exception sql异常
      **/
     default List<TableParameter> getTableStructureByKey(String databaseName, String tableName) throws Exception {
         return new ArrayList<>();
@@ -75,7 +73,6 @@ public interface DataResult {
      * @param tableName    表名
      * @param catalog      库名
      * @return List<TableParameter>
-     * @throws Exception
      **/
     default List<TableParameter> getTableStructureByKeyForMode(String databaseName, String tableName, String catalog) {
         return new ArrayList<>();
@@ -83,16 +80,13 @@ public interface DataResult {
 
     /**
      * 单击时，中间数据变化
-     *
-     * @return void
      **/
     void doListValueChanged();
 
     /**
      * 双击时，中间数据变化
      *
-     * @return void
-     * @throws SQLException
+     * @throws SQLException sql异常
      **/
     void doListDataValueChanged() throws SQLException;
 
@@ -102,7 +96,7 @@ public interface DataResult {
      * @param tableName    表名
      * @param databaseName 数据库名
      * @return java.util.Map<ErrorMsg>
-     * @throws Exception
+     * @throws Exception 异常
      **/
     Map<String, ErrorMsg> checkExist(String tableName, String databaseName) throws Exception;
 

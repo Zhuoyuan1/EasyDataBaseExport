@@ -4,7 +4,7 @@ import com.easydatabaseexport.common.CommonConstant;
 import com.easydatabaseexport.log.LogManager;
 import com.easydatabaseexport.ui.IndexJavaFrame;
 import lombok.SneakyThrows;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author lzy
  */
-@Log
+@Log4j
 public class SwingUtils {
 
     private static Timer TIMER = null;
@@ -77,7 +77,7 @@ public class SwingUtils {
      */
     public static void rebootFrame(String msg, String title, JFrame jFrame, JFrame mainFrame) {
         int n = JOptionPane.showConfirmDialog(null, msg + "，是否立即重启？", title, JOptionPane.YES_NO_OPTION);
-        if (n == 0) {
+        if (n == JOptionPane.YES_OPTION) {
             if (Objects.nonNull(jFrame)) {
                 jFrame.dispose();
             }

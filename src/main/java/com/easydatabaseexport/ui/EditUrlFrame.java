@@ -2,6 +2,7 @@ package com.easydatabaseexport.ui;
 
 import com.easydatabaseexport.common.CommonConstant;
 import com.easydatabaseexport.common.PatternConstant;
+import com.easydatabaseexport.enums.ConfigKeyEnum;
 import com.easydatabaseexport.util.AESCoder;
 import com.easydatabaseexport.util.FileIniRead;
 import com.easydatabaseexport.util.SwingUtils;
@@ -11,11 +12,8 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -23,7 +21,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.EventObject;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -300,8 +297,8 @@ public class EditUrlFrame {
      **/
     private void confirm(JFrame jframe, JFrame mainFrame, List<String> deletedKeys, String message) {
         int n = JOptionPane.showConfirmDialog(null, message, "提醒", JOptionPane.YES_NO_OPTION);
-        if (n == 0) {
-            FileIniRead.deleteIniConf(deletedKeys);
+        if (n == JOptionPane.YES_OPTION) {
+            FileIniRead.deleteIniConf(ConfigKeyEnum.SYS.getKey(), deletedKeys);
             SwingUtils.rebootFrame("保存成功", "", jframe, mainFrame);
         }
     }
@@ -316,8 +313,8 @@ public class EditUrlFrame {
      **/
     private void deleteAndInsert(JFrame jframe, JFrame mainFrame, List<String> keys, Map<String, String> allKeysMap) {
         int n = JOptionPane.showConfirmDialog(null, "是否保存修改？", "提醒", JOptionPane.YES_NO_OPTION);
-        if (n == 0) {
-            FileIniRead.deleteIniConf(keys);
+        if (n == JOptionPane.YES_OPTION) {
+            FileIniRead.deleteIniConf(ConfigKeyEnum.SYS.getKey(), keys);
             //重新写入
             FileIniRead.insertIniConf(allKeysMap);
             SwingUtils.rebootFrame("保存成功", "", jframe, mainFrame);
@@ -343,37 +340,6 @@ public class EditUrlFrame {
             configMap.put(stringBuilder.toString(), strings[4]);
         }
         return stringBuilder.toString();
-    }
-
-    static class MyCell extends AbstractCellEditor implements TableCellEditor, TableCellRenderer {
-
-        @Override
-        public Object getCellEditorValue() {
-            return null;
-        }
-
-        @Override
-        public boolean isCellEditable(EventObject anEvent) {
-            return false;
-        }
-
-        @Override
-        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-            return initPanel(table, value, isSelected);
-        }
-
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            return initPanel(table, value, isSelected);
-        }
-
-        private JPanel initPanel(JTable table, Object value, boolean isSelected) {
-            JPanel jp = new JPanel(new BorderLayout());
-            jp.add(new JLabel(value.toString()), BorderLayout.WEST);
-            jp.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
-            jp.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
-            return jp;
-        }
     }
 
     enum MoveType {

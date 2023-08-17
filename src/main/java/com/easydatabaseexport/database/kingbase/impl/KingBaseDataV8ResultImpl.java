@@ -13,7 +13,7 @@ import com.easydatabaseexport.log.LogManager;
 import com.easydatabaseexport.util.HtmlUtils;
 import com.easydatabaseexport.util.StringUtil;
 import lombok.SneakyThrows;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
  * @author lzy
  * @date 2022/07/21 10:03
  **/
-@Log
+@Log4j
 public class KingBaseDataV8ResultImpl extends AbstractDataResultImpl implements DataResult {
 
     @Override

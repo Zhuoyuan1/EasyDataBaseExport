@@ -1,5 +1,6 @@
 package com.easydatabaseexport.ui.component;
 
+import com.easydatabaseexport.common.EnvironmentConstant;
 import com.easydatabaseexport.ui.ConfigJavaFrame;
 import com.easydatabaseexport.util.CheckUpdateUtil;
 import com.easydatabaseexport.util.OpenUrl;
@@ -162,15 +163,17 @@ public class CustomMenu {
                 String str = "作者：像风一样   qq: 963565242";
                 JLabel js = new JLabel(stringBuilder);
                 JLabel js1 = new JLabel(str);
+                JLabel js2 = new JLabel("软件版本：" + EnvironmentConstant.VERSION);
                 JPanel jPanel = new JPanel();
                 JPanel jPanel1 = new JPanel();
                 jPanel.add(js);
                 jPanel.add(js1);
+                jPanel.add(js2);
                 jPanel1.add(supportButton);
                 jPanel1.add(aboutButton);
                 jPanel.add(jPanel1);
                 jFrame.add(jPanel);
-                jFrame.setSize(300, 210);
+                jFrame.setSize(265, 230);
                 jFrame.setLocationRelativeTo(null);
                 jFrame.setVisible(true);
                 ActionListener aboutListener = e1 -> {

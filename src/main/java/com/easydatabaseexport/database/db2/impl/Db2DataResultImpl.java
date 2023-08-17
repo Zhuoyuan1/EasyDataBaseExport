@@ -1,6 +1,5 @@
 package com.easydatabaseexport.database.db2.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.easydatabaseexport.common.CommonConstant;
 import com.easydatabaseexport.common.CommonDataBaseType;
 import com.easydatabaseexport.core.DataResult;
@@ -14,9 +13,8 @@ import com.easydatabaseexport.entities.TableTypeForMode;
 import com.easydatabaseexport.log.LogManager;
 import com.easydatabaseexport.util.HtmlUtils;
 import com.easydatabaseexport.util.StringUtil;
-import com.mysql.cj.util.StringUtils;
 import lombok.SneakyThrows;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -39,7 +37,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
@@ -49,7 +46,7 @@ import java.util.stream.Collectors;
  * @author lzy
  * @date 2022/7/21 10:37
  **/
-@Log
+@Log4j
 public class Db2DataResultImpl extends AbstractDataResultImpl implements DataResult {
 
     @Override
@@ -110,13 +107,13 @@ public class Db2DataResultImpl extends AbstractDataResultImpl implements DataRes
     public void initList() {
         CommonConstant.tableParameterList.clear();
         String newSql = String.format(sql.replace("?", "%s"), CommonConstant.DATABASE_NAME, CommonConstant.TABLE_NAME);
-        CommonConstant.tableParameterList.addAll(toList(new TableParameter(), newSql));
+        CommonConstant.tableParameterList.addAll(toListNoMode(new TableParameter(), newSql));
     }
 
     @Override
     public List<TableParameter> getTableStructureByKey(String databaseName, String tableName) throws Exception {
         String newSql = String.format(sql.replace("?", "%s"), databaseName, tableName);
-        return toList(new TableParameter(), newSql);
+        return toListNoMode(new TableParameter(), newSql);
     }
 
 
@@ -138,19 +135,6 @@ public class Db2DataResultImpl extends AbstractDataResultImpl implements DataRes
         }
         jPanel.addTab("DDL", null, scrollPane, "DDL");
         return jPanel;
-    }
-
-    @Override
-    @SneakyThrows
-    public ResultSet getResultSetBySql(String sql, String... params) {
-        PreparedStatement ppst = null;
-        ppst = CommonConstant.connection.prepareStatement(sql);
-        ResultSet rs = null;
-        for (int i = 1; i <= params.length; i++) {
-            ppst.setString(i, params[i - 1]);
-        }
-        rs = ppst.executeQuery();
-        return rs;
     }
 
     private long getDB2DDL(String db2lookinfoParams) {
@@ -180,7 +164,7 @@ public class Db2DataResultImpl extends AbstractDataResultImpl implements DataRes
 
         //获取返回的ResultSet内容
         try {
-            ResultSet ddlRs = getResultSetBySql(String.format(db2Sql, opToken));
+            ResultSet ddlRs = getResultSetBySqlNoMode(String.format(db2Sql, opToken));
             while (ddlRs.next()) {
                 str.append(StringUtil.StringEqual(ddlRs.getString(1)));
             }
@@ -242,7 +226,7 @@ public class Db2DataResultImpl extends AbstractDataResultImpl implements DataRes
             Statement stmt = CommonConstant.connection.createStatement();
             //执行查询所有数据库操作
             ResultSet rs = null;
-            if (StringUtils.isNullOrEmpty(CommonConstant.DATABASE_NAME)) {
+            if (StringUtil.isEmpty(CommonConstant.DATABASE_NAME)) {
                 rs = stmt.executeQuery("SELECT SCHEMANAME FROM syscat.SCHEMATA ");
             } else {
                 rs = stmt.executeQuery("SELECT SCHEMANAME FROM syscat.SCHEMATA ");
@@ -275,7 +259,7 @@ public class Db2DataResultImpl extends AbstractDataResultImpl implements DataRes
 
         List<IndexInfo> indexList = new ArrayList<>();
         List<IndexInfoVO> voList = new ArrayList<>();
-        ResultSet rs = getResultSetBySql(sql);
+        ResultSet rs = getResultSetBySqlNoMode(sql);
 
         //获取返回的ResultSet内容
         try {
@@ -329,7 +313,7 @@ public class Db2DataResultImpl extends AbstractDataResultImpl implements DataRes
 
         String newSql = String.format(sql.replace("?", "%s"), name);
         List<TableType> list = new ArrayList<>();
-        List<TableTypeForMode> db2List = toList(new TableTypeForMode(), newSql);
+        List<TableTypeForMode> db2List = toListNoMode(new TableTypeForMode(), newSql);
         db2List.forEach(v -> {
             v.setTableName(StringUtil.StringEqual(v.getTableName()) + "[" + StringUtil.StringEqual(v.getComments()) + "]");
             TableType tableType = new TableType();
@@ -340,24 +324,6 @@ public class Db2DataResultImpl extends AbstractDataResultImpl implements DataRes
         });
         CommonDataBaseType.CON_DATABASE_TABLE_MAP = list.parallelStream().collect(Collectors.groupingBy(TableType::getTableSchema));
         CommonDataBaseType.CON_MODE_TABLE_MAP = db2List.parallelStream().collect(Collectors.groupingBy(TableTypeForMode::getTableSchema));
-    }
-
-    @Override
-    public <T> List<T> toList(T t, String sql) throws SQLException {
-        PreparedStatement ppst = null;
-        List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
-        ppst = CommonConstant.connection.prepareStatement(sql);
-        ResultSet rs = ppst.executeQuery();
-        while (rs.next()) {
-            Map<String, String> resultMap = new HashMap<String, String>();
-            ResultSetMetaData metaData = rs.getMetaData();
-            int columnCount = metaData.getColumnCount();
-            for (int i = 1; i < columnCount + 1; i++) {
-                resultMap.put(metaData.getColumnLabel(i), Optional.ofNullable(rs.getString(i)).orElse("").trim());
-            }
-            resultList.add(resultMap);
-        }
-        return (List<T>) JSON.parseArray(JSON.toJSONString(resultList), t.getClass());
     }
 
     /**

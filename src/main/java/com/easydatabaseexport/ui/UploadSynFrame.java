@@ -1,5 +1,7 @@
 package com.easydatabaseexport.ui;
 
+import com.easydatabaseexport.enums.ConfigKeyEnum;
+import com.easydatabaseexport.enums.DataBaseType;
 import com.easydatabaseexport.enums.NavicatVerEnum;
 import com.easydatabaseexport.log.LogManager;
 import com.easydatabaseexport.ui.component.LinkLabel;
@@ -8,7 +10,7 @@ import com.easydatabaseexport.util.DecodeNcx;
 import com.easydatabaseexport.util.FileIniRead;
 import com.easydatabaseexport.util.FileOperateUtil;
 import com.easydatabaseexport.util.SwingUtils;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 import org.apache.commons.codec.binary.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -42,7 +44,7 @@ import java.util.Map;
  * @author lzy
  * @date 2021/01/10 17:03
  */
-@Log
+@Log4j
 public class UploadSynFrame {
     private static final double NAVICAT11 = 1.1D;
 
@@ -179,13 +181,23 @@ public class UploadSynFrame {
         for (Map<String, Map<String, String>> map : list) {
             for (Map.Entry<String, Map<String, String>> valueMap : map.entrySet()) {
                 Map<String, String> resultMap = valueMap.getValue();
+                if (null == DataBaseType.matchType(resultMap.get("ConnType"))) {
+                    continue;
+                }
                 String password = Base64.encodeBase64String(AESCoder.encrypt(decodeNcx
                         .decode(resultMap.getOrDefault("Password", "")).getBytes(), AESCoder.readFileReturnByte()));
-                String msg = resultMap.get("ConnectionName") + "/" + resultMap.get("Host") + "|" + resultMap.get("Port")
-                        + "|" + resultMap.get("Database") + "|" + resultMap.get("UserName") + "|" + resultMap.get("ConnType") + " = "
-                        + password;
+                String msg = "";
+                if (DataBaseType.SQLITE.name().equalsIgnoreCase(resultMap.get("ConnType"))) {
+                    msg = resultMap.get("ConnectionName") + "/" + resultMap.get("DatabaseFileName").replaceAll(":", "|")
+                            + "|" + resultMap.get("Database") + "|" + resultMap.get("UserName") + "|" + resultMap.get("ConnType") + " = "
+                            + password;
+                } else {
+                    msg = resultMap.get("ConnectionName") + "/" + resultMap.get("Host") + "|" + resultMap.get("Port")
+                            + "|" + resultMap.get("Database") + "|" + resultMap.get("UserName") + "|" + resultMap.get("ConnType") + " = "
+                            + password;
+                }
                 FileOperateUtil.writeData(FileOperateUtil.getSavePath()
-                        + FileIniRead.FILE_NAME, "sys", "", msg);
+                        + FileIniRead.FILE_NAME, ConfigKeyEnum.SYS.getKey(), "", msg);
             }
         }
     }

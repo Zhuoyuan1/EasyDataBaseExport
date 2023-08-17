@@ -8,7 +8,7 @@ import com.easydatabaseexport.util.AddToTopic;
 import com.easydatabaseexport.util.FileOperateUtil;
 import com.easydatabaseexport.util.WordReporter;
 import lombok.SneakyThrows;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 
 import java.awt.event.ActionListener;
@@ -20,7 +20,7 @@ import java.io.File;
  * @author lzy
  * @date 2022/11/10 9:34
  **/
-@Log
+@Log4j
 @Deprecated
 public class WordActionListener extends AbstractActionListener implements ActionListener {
 

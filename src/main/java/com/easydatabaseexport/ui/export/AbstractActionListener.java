@@ -16,7 +16,7 @@ import com.easydatabaseexport.ui.component.JCheckBoxTree;
 import com.easydatabaseexport.util.FileOperateUtil;
 import com.easydatabaseexport.util.StringUtil;
 import lombok.SneakyThrows;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -42,7 +42,7 @@ import java.util.stream.IntStream;
  * @author lzy
  * @date 2022/7/28 11:39
  **/
-@Log
+@Log4j
 public abstract class AbstractActionListener implements ActionListener {
     /**
      * 数据树
@@ -55,19 +55,19 @@ public abstract class AbstractActionListener implements ActionListener {
     /**
      * 导出 表信息 集合
      **/
-    public Map<String, List<TableParameter>> listMap = new LinkedHashMap<>();
+    protected Map<String, List<TableParameter>> listMap = new LinkedHashMap<>();
     /**
      * 导出 索引 集合
      **/
-    public Map<String, List<IndexInfoVO>> indexMap = new HashMap<>(16);
+    protected Map<String, List<IndexInfoVO>> indexMap = new HashMap<>(16);
 
     /**
      * 是否处理处理数据
      **/
-    public boolean isProcess = false;
-    public boolean selectMode = false;
-    public int i = 2;
-    public int j = 1;
+    private boolean isProcess = false;
+    private boolean selectMode = false;
+    private int i = 2;
+    private int j = 1;
 
     /**
      * 定义每个线程处理多少表
@@ -198,7 +198,7 @@ public abstract class AbstractActionListener implements ActionListener {
                         if (completableFuture.get()) {
                             int n = JOptionPane.showConfirmDialog(null, "导出成功！\n文件已保存到："
                                     + file.getAbsolutePath() + "\n是否立即打开查看文件？", "成功", JOptionPane.YES_NO_OPTION);
-                            if (n == 0) {
+                            if (n == JOptionPane.YES_OPTION) {
                                 FileOperateUtil.open(file);
                             }
                         }

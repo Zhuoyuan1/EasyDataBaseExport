@@ -12,9 +12,8 @@ import com.easydatabaseexport.entities.TableType;
 import com.easydatabaseexport.log.LogManager;
 import com.easydatabaseexport.util.HtmlUtils;
 import com.easydatabaseexport.util.StringUtil;
-import com.mysql.cj.util.StringUtils;
 import lombok.SneakyThrows;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -44,7 +43,7 @@ import java.util.stream.Collectors;
  * @author lzy
  * @date 2021/11/1 15:35
  **/
-@Log
+@Log4j
 public class SqlServerDataResultImpl extends AbstractDataResultImpl implements DataResult {
 
     @Override
@@ -58,7 +57,7 @@ public class SqlServerDataResultImpl extends AbstractDataResultImpl implements D
         ResultSet rs = null;
 
         //首先执行选库操作
-        if (!StringUtils.isNullOrEmpty(CommonConstant.DATABASE_NAME)) {
+        if (!StringUtil.isEmpty(CommonConstant.DATABASE_NAME)) {
             ppst = CommonConstant.connection.prepareStatement(stringBuilder.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             ppst.execute();
         }

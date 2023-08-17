@@ -12,9 +12,8 @@ import com.easydatabaseexport.entities.TableType;
 import com.easydatabaseexport.log.LogManager;
 import com.easydatabaseexport.util.HtmlUtils;
 import com.easydatabaseexport.util.StringUtil;
-import com.mysql.cj.util.StringUtils;
 import lombok.SneakyThrows;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -45,7 +44,7 @@ import java.util.stream.Collectors;
  * @author lzy
  * @date 2021/11/1 15:33
  **/
-@Log
+@Log4j
 public class MySqlDataResultImpl extends AbstractDataResultImpl implements DataResult {
 
     @Override
@@ -200,7 +199,7 @@ public class MySqlDataResultImpl extends AbstractDataResultImpl implements DataR
             Statement stmt = CommonConstant.connection.createStatement();
             //执行查询所有数据库操作
             ResultSet rs = null;
-            if (StringUtils.isNullOrEmpty(CommonConstant.DATABASE_NAME)) {
+            if (StringUtil.isEmpty(CommonConstant.DATABASE_NAME)) {
                 rs = stmt.executeQuery("show databases");
             } else {
                 rs = stmt.executeQuery("show databases like '" + CommonConstant.DATABASE_NAME + "'");

@@ -13,7 +13,7 @@ import com.easydatabaseexport.log.LogManager;
 import com.easydatabaseexport.util.HtmlUtils;
 import com.easydatabaseexport.util.StringUtil;
 import lombok.SneakyThrows;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
  * @author lzy
  * @date 2021/11/1 15:35
  **/
-@Log
+@Log4j
 public class XuguDataResultImpl extends AbstractDataResultImpl implements DataResult {
 
     @Override

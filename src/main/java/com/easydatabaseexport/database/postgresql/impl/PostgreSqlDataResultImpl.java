@@ -13,7 +13,7 @@ import com.easydatabaseexport.log.LogManager;
 import com.easydatabaseexport.util.HtmlUtils;
 import com.easydatabaseexport.util.StringUtil;
 import lombok.SneakyThrows;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
  * @author lzy
  * @date 2022/07/21 10:03
  **/
-@Log
+@Log4j
 public class PostgreSqlDataResultImpl extends AbstractDataResultImpl implements DataResult {
 
     @Override
@@ -432,8 +432,8 @@ public class PostgreSqlDataResultImpl extends AbstractDataResultImpl implements 
         String sql = "SELECT c.oid, n.nspname AS schemaname, c.relname AS tablename, c.relacl, pg_get_userbyid(c.relowner) AS tableowner, " +
                 "obj_description(c.oid) AS description, c.relkind, ci.relname As cluster, c.relhasindex AS hasindexes, " +
                 "c.relhasrules AS hasrules, t.spcname AS tablespace, c.reloptions AS param, c.relhastriggers AS hastriggers, " +
-                "c.relpersistence AS unlogged, ft.ftoptions, fs.srvname, c.relispartition, pg_get_expr(c.relpartbound, c.oid) " +
-                "AS relpartbound, c.reltuples, ((SELECT count(*) FROM pg_inherits WHERE inhparent = c.oid) > 0) AS inhtable, " +
+                "c.relpersistence AS unlogged, ft.ftoptions, fs.srvname, " +
+                "c.reltuples, ((SELECT count(*) FROM pg_inherits WHERE inhparent = c.oid) > 0) AS inhtable, " +
                 "i2.nspname AS inhschemaname, i2.relname AS inhtablename FROM pg_class c LEFT JOIN pg_namespace n ON n.oid =" +
                 " c.relnamespace LEFT JOIN pg_tablespace t ON t.oid = c.reltablespace LEFT JOIN (pg_inherits i INNER JOIN pg_class c2 " +
                 "ON i.inhparent = c2.oid LEFT JOIN pg_namespace n2 ON n2.oid = c2.relnamespace) i2 ON i2.inhrelid = c.oid LEFT JOIN pg_index ind " +

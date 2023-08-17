@@ -1,7 +1,7 @@
 package com.easydatabaseexport.util;
 
 import com.easydatabaseexport.log.LogManager;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
@@ -17,7 +17,7 @@ import java.io.OutputStream;
  * @author lzy
  * @date 2021/3/21 22:25
  **/
-@Log
+@Log4j
 public class AddToTopic {
 
     /*public static void main(String[] args) throws Exception {
@@ -36,7 +36,7 @@ public class AddToTopic {
                     if (text != null && text.contains(findText)) {
                         text = text.replace(findText, replaceText);
                         r.setText(text, 0);
-                        addField(p, "TOC \\o \"1-3\" \\h \\z \\u");
+                        addField(p);
                         // addField(p, "TOC \\h");
                         break;
                     }
@@ -53,9 +53,9 @@ public class AddToTopic {
         }
     }
 
-    private static void addField(XWPFParagraph paragraph, String fieldName) {
+    private static void addField(XWPFParagraph paragraph) {
         CTSimpleField ctSimpleField = paragraph.getCTP().addNewFldSimple();
-        ctSimpleField.setInstr(fieldName);
+        ctSimpleField.setInstr("TOC \\o \"1-3\" \\h \\z \\u");
         ctSimpleField.setDirty(true);
         ctSimpleField.addNewR().addNewT().setStringValue("<>");
     }

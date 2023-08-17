@@ -1,7 +1,5 @@
 package com.easydatabaseexport.util;
 
-import com.mysql.cj.util.StringUtils;
-
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -16,14 +14,14 @@ public class StringUtil {
     private static final String EMPTY_STR = "null";
 
     public static String StringEqual(String str) {
-        if (StringUtils.isNullOrEmpty(str) || EMPTY_STR.equals(str)) {
+        if (StringUtil.isEmpty(str) || EMPTY_STR.equals(str)) {
             return "--";
         }
         return str;
     }
 
     public static String stringNullForEmpty(String str) {
-        if (StringUtils.isNullOrEmpty(str) || EMPTY_STR.equals(str)) {
+        if (StringUtil.isEmpty(str) || EMPTY_STR.equals(str)) {
             return "";
         }
         return str;
@@ -48,7 +46,7 @@ public class StringUtil {
     }
 
     public static String stringEqualHtml(String str) {
-        if (StringUtils.isNullOrEmpty(str) || EMPTY_STR.equals(str)) {
+        if (StringUtil.isEmpty(str) || EMPTY_STR.equals(str)) {
             return "<br>";
         }
         return str;

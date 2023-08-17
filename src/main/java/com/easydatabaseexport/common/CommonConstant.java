@@ -11,7 +11,7 @@ import com.easydatabaseexport.util.FileIniRead;
 import com.easydatabaseexport.util.FileOperateUtil;
 import com.easydatabaseexport.util.StringUtil;
 import lombok.SneakyThrows;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,7 +35,7 @@ import java.util.regex.Pattern;
  * @author lzy
  * @date 2021/11/1 14:51
  **/
-@Log
+@Log4j
 public final class CommonConstant {
 
     public static final String IP_PORT = "^(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])" +
@@ -77,10 +78,14 @@ public final class CommonConstant {
     /**
      * 不变的表头用于展示 和 配置选择
      **/
+    public static String[] INDEX_CONFIG_HEAD_NAMES =
+            INDEX_HEAD_NAMES.clone();
+    public static String[] COLUMN_CONFIG_HEAD_NAMES =
+            COLUMN_HEAD_NAMES.clone();
     public static final String[] INDEX_FINAL_HEAD_NAMES =
-            {"名称", "字段", "索引类型", "索引方法", "注释"};
+            Arrays.copyOf(INDEX_HEAD_NAMES, INDEX_HEAD_NAMES.length);
     public static final String[] COLUMN_FINAL_HEAD_NAMES =
-            {"序号", "字段名", "类型", "长度", "是否为空", "默认值", "小数位", "注释"};
+            Arrays.copyOf(COLUMN_HEAD_NAMES, COLUMN_HEAD_NAMES.length);
     /**
      * 表名
      **/
@@ -162,9 +167,8 @@ public final class CommonConstant {
         } else if (EXPORT.equals(key)) {
             for (ConfigEnum configEnum : ConfigEnum.values()) {
                 if (!configMap.containsKey(configEnum.getKey())) {
-                    if (configEnum.getKey().equals(ConfigEnum.TABLE_HEAD.getKey()) ||
-                            configEnum.getKey().equals(ConfigEnum.INDEX_TABLE_HEAD.getKey()) ||
-                            configEnum.getKey().equals(ConfigEnum.DEFAULT_EXPORT_PATH.getKey())) {
+                    if (!configEnum.getKey().equals(ConfigEnum.INDEX.getKey()) &&
+                            !configEnum.getKey().equals(ConfigEnum.SHEET.getKey())) {
                         writeNewKey(configEnum.getKey(), configEnum.getValue());
                     } else {
                         writeNewKey(configEnum.getKey(), null);

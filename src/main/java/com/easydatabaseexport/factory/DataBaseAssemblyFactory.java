@@ -25,16 +25,20 @@ public class DataBaseAssemblyFactory {
 
     static {
         // [连接-库-表]
-        REPORT_POOL.put(DataBaseType.MYSQL.name(), new ConDatabaseTableImpl());
+        ConDatabaseTableImpl tableType = new ConDatabaseTableImpl();
         // [连接-模式-表]
-        REPORT_POOL.put(DataBaseType.ORACLE.name(), new ConModeTableImpl());
-        REPORT_POOL.put(DataBaseType.DM.name(), new ConModeTableImpl());
-        REPORT_POOL.put(DataBaseType.DB2.name(), new ConModeTableImpl());
+        ConModeTableImpl tableModeType = new ConModeTableImpl();
         // [连接-库-模式-表]
-        REPORT_POOL.put(DataBaseType.SQLSERVER.name(), new ConDatabaseModeTableImpl());
-        REPORT_POOL.put(DataBaseType.POSTGRESQL.name(), new ConDatabaseModeTableImpl());
-        REPORT_POOL.put(DataBaseType.KINGBASE8.name(), new ConDatabaseModeTableImpl());
-        REPORT_POOL.put(DataBaseType.XUGU.name(), new ConDatabaseModeTableImpl());
+        ConDatabaseModeTableImpl tableMode = new ConDatabaseModeTableImpl();
+        REPORT_POOL.put(DataBaseType.MYSQL.name(), tableType);
+        REPORT_POOL.put(DataBaseType.SQLITE.name(), tableType);
+        REPORT_POOL.put(DataBaseType.ORACLE.name(), tableModeType);
+        REPORT_POOL.put(DataBaseType.DM.name(), tableModeType);
+        REPORT_POOL.put(DataBaseType.DB2.name(), tableModeType);
+        REPORT_POOL.put(DataBaseType.SQLSERVER.name(), tableMode);
+        REPORT_POOL.put(DataBaseType.POSTGRESQL.name(), tableMode);
+        REPORT_POOL.put(DataBaseType.KINGBASE8.name(), tableMode);
+        REPORT_POOL.put(DataBaseType.XUGU.name(), tableMode);
     }
 
     /**

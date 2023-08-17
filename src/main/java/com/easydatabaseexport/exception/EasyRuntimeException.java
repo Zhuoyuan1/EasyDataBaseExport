@@ -1,8 +1,7 @@
 package com.easydatabaseexport.exception;
 
 import com.easydatabaseexport.log.LogManager;
-
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 
 /**
  * describe :

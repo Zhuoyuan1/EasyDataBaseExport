@@ -23,6 +23,10 @@ public enum DataBaseType {
      */
     SQLSERVER("jdbc:sqlserver://%s:%s;databaseName=%s"),
     /**
+     * SQL_SERVER
+     */
+    SQLITE("jdbc:sqlite:%s"),
+    /**
      * POSTGRESQL
      **/
     POSTGRESQL("jdbc:postgresql://%s:%s/%s"),

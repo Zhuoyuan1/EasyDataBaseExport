@@ -6,7 +6,7 @@ import com.easydatabaseexport.core.DataResult;
 import com.easydatabaseexport.entities.TableParameter;
 import com.easydatabaseexport.util.DataUtils;
 import lombok.SneakyThrows;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * AbstractDataResultImpl
@@ -30,25 +31,30 @@ import java.util.Map;
  * @author lzy
  * @date 2022/3/15 16:17
  **/
-@Log
+@Log4j
 public abstract class AbstractDataResultImpl implements DataResult {
 
     @SneakyThrows
     public ResultSet getResultSetBySql(String sql, String... params) {
-        PreparedStatement preparedStatement = null;
-        preparedStatement = CommonConstant.connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-        ResultSet resultSet = null;
+        PreparedStatement preparedStatement = CommonConstant.connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
         for (int i = 1; i <= params.length; i++) {
             preparedStatement.setString(i, params[i - 1]);
         }
-        resultSet = preparedStatement.executeQuery();
-        return resultSet;
+        return preparedStatement.executeQuery();
+    }
+
+    @SneakyThrows
+    public ResultSet getResultSetBySqlNoMode(String sql, String... params) {
+        PreparedStatement preparedStatement = CommonConstant.connection.prepareStatement(sql);
+        for (int i = 1; i <= params.length; i++) {
+            preparedStatement.setString(i, params[i - 1]);
+        }
+        return preparedStatement.executeQuery();
     }
 
     public <T> List<T> toList(T t, String sql) throws SQLException {
-        PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement = CommonConstant.connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
         List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
-        preparedStatement = CommonConstant.connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
         ResultSet resultSet = preparedStatement.executeQuery();
         while (resultSet.next()) {
             Map<String, String> resultMap = new HashMap<String, String>();
@@ -56,6 +62,22 @@ public abstract class AbstractDataResultImpl implements DataResult {
             int columnCount = metaData.getColumnCount();
             for (int i = 1; i < columnCount + 1; i++) {
                 resultMap.put(metaData.getColumnLabel(i), resultSet.getString(i));
+            }
+            resultList.add(resultMap);
+        }
+        return (List<T>) JSON.parseArray(JSON.toJSONString(resultList), t.getClass());
+    }
+
+    public <T> List<T> toListNoMode(T t, String sql) throws SQLException {
+        PreparedStatement ppst = CommonConstant.connection.prepareStatement(sql);
+        List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
+        ResultSet rs = ppst.executeQuery();
+        while (rs.next()) {
+            Map<String, String> resultMap = new HashMap<String, String>();
+            ResultSetMetaData metaData = rs.getMetaData();
+            int columnCount = metaData.getColumnCount();
+            for (int i = 1; i < columnCount + 1; i++) {
+                resultMap.put(metaData.getColumnLabel(i), Optional.ofNullable(rs.getString(i)).orElse("").trim());
             }
             resultList.add(resultMap);
         }

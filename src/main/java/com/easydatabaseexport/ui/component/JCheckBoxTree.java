@@ -1,10 +1,12 @@
 package com.easydatabaseexport.ui.component;
 
 import com.easydatabaseexport.common.CommonConstant;
+import com.easydatabaseexport.enums.RightMenu;
 import com.easydatabaseexport.factory.DataBaseAssemblyFactory;
 import com.easydatabaseexport.factory.assembly.DataBaseAssembly;
 import com.easydatabaseexport.factory.assembly.impl.ConDatabaseModeTableImpl;
-import javafx.util.Pair;
+import com.easydatabaseexport.factory.assembly.impl.ConDatabaseTableImpl;
+import org.apache.commons.math3.util.Pair;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -13,6 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -75,13 +78,20 @@ public class JCheckBoxTree extends JTree {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                int row = tree.getRowForLocation(e.getX(), e.getY());
-                TreePath path = tree.getPathForRow(row);
+                TreePath path = tree.getPathForLocation(e.getX(), e.getY());
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    tree.setSelectionPath(path);
+                }
                 DefaultMutableTreeNode selectionNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
                 if (null == selectionNode) {
                     return;
                 }
-                if (path != null && null != selectionNode) {
+                if (path != null) {
+                    //右键数据库时，其余选择的全部取消
+                    if (SwingUtilities.isRightMouseButton(e)) {
+                        CheckNode node = (CheckNode) tree.getModel().getRoot();
+                        node.setSelected(false);
+                    }
                     CheckNode node = (CheckNode) path.getLastPathComponent();
                     node.setSelected(!node.isSelected);
                     /*if (node.getSelectionMode() == CheckNode.DIG_IN_SELECTION) {
@@ -232,7 +242,7 @@ public class JCheckBoxTree extends JTree {
     }
 
 
-    private class CheckRenderer extends JPanel implements TreeCellRenderer {
+    public class CheckRenderer extends JPanel implements TreeCellRenderer {
         private static final long serialVersionUID = 1L;
 
         protected JCheckBox check;
@@ -256,22 +266,31 @@ public class JCheckBoxTree extends JTree {
                                                       boolean hasFocus) {
             String stringValue = tree.convertValueToText(value, isSelected, expanded, leaf, row, hasFocus);
             setEnabled(tree.isEnabled());
-            check.setSelected(((CheckNode) value).isSelected());
+            CheckNode checkNode = (CheckNode) value;
+            check.setSelected(checkNode.isSelected());
             label.setFont(tree.getFont());
             label.setText(stringValue);
             label.setSelected(isSelected);
             label.setFocus(hasFocus);
             DataBaseAssembly dataBaseAssembly = DataBaseAssemblyFactory.get(CommonConstant.DATA_BASE_TYPE);
             List<ImageIcon> list = dataBaseAssembly.image();
-            if (leaf && (((CheckNode) value).getParent() != null) && ((CheckNode) value).getParent().getParent() != null) {
+            if (leaf && (checkNode.getParent() != null) && checkNode.getParent().getParent() != null) {
                 label.setIcon(list.size() == 4 ? list.get(3) : list.get(2));
-            } else if (((CheckNode) value).isRoot()) {
+                checkNode.setType(RightMenu.table.name());
+            } else if (checkNode.isRoot()) {
                 label.setIcon(list.get(0));
+                checkNode.setType(RightMenu.connect.name());
             } else {
                 label.setIcon(list.get(1));
-                if (((CheckNode) value).getLevel() == 2) {
+                if (dataBaseAssembly instanceof ConDatabaseTableImpl) {
+                    checkNode.setType(RightMenu.database.name());
+                } else {
+                    checkNode.setType(RightMenu.pattern.name());
+                }
+                if (checkNode.getLevel() == 2) {
                     if (Objects.nonNull(list.get(2))) {
                         label.setIcon(list.get(2));
+                        checkNode.setType(RightMenu.pattern.name());
                     }
                 }
             }
@@ -394,6 +413,11 @@ public class JCheckBoxTree extends JTree {
 
         protected boolean isSelected;
 
+        /**
+         * 区分连接、模式、数据库、表
+         **/
+        private String type;
+
         public CheckNode() {
             this(null);
         }
@@ -441,6 +465,15 @@ public class JCheckBoxTree extends JTree {
 
         public boolean isSelected() {
             return isSelected;
+        }
+
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
         }
     }
 }

@@ -3,8 +3,7 @@ package com.easydatabaseexport.util;
 import com.easydatabaseexport.entities.IndexInfoVO;
 import com.easydatabaseexport.entities.TableParameter;
 import com.easydatabaseexport.log.LogManager;
-import com.mysql.cj.util.StringUtils;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 
@@ -31,7 +30,7 @@ import java.util.stream.Collectors;
  * @author lzy
  * @date 2021/2/28 19:02
  **/
-@Log
+@Log4j
 public class WordReporter {
     private String tempLocalPath;
     private XWPFDocument xwpfDocument = null;
@@ -142,7 +141,7 @@ public class WordReporter {
                     List<IndexInfoVO> indexInfoVOList = indexMap.get(name);
                     for (int j = 0; j < indexInfoVOList.size(); j++) {
                         Map<String, String> map = new HashMap<>();
-                        map.put("no", (j + 1) + "");
+                        map.put("no", String.valueOf(j + 1));
                         map.put("name", indexInfoVOList.get(j).getName());
                         map.put("columnName", indexInfoVOList.get(j).getColumnName());
                         map.put("indexType", indexInfoVOList.get(j).getIndexType());
@@ -269,7 +268,7 @@ public class WordReporter {
                 tmpCell = tmpCells.get(k);
                 XWPFTableCell cell = cells.get(k);
                 cellText = tmpCell.getText();
-                if (!StringUtils.isNullOrEmpty(cellText)) {
+                if (!StringUtil.isEmpty(cellText)) {
                     //转换为mapkey对应的字段
                     cellTextKey = cellText.replace("$", "").replace("{", "").replace("}", "");
                     if (map.containsKey(cellTextKey)) {
@@ -424,7 +423,7 @@ public class WordReporter {
                 tmpCell = tmpCells.get(k);
                 XWPFTableCell cell = cells.get(k);
                 cellText = tmpCell.getText();
-                if (!StringUtils.isNullOrEmpty(cellText)) {
+                if (!StringUtil.isEmpty(cellText)) {
                     //转换为mapkey对应的字段
                     cellTextKey = cellText.replace("$", "").replace("{", "").replace("}", "");
                     if (map.containsKey(cellTextKey)) {
@@ -501,7 +500,7 @@ public class WordReporter {
                 tmpCell = tmpCells.get(k);
                 XWPFTableCell cell = cells.get(k);
                 cellText = tmpCell.getText();
-                if (!StringUtils.isNullOrEmpty(cellText)) {
+                if (!StringUtil.isEmpty(cellText)) {
                     //转换为mapkey对应的字段
                     cellTextKey = cellText.replace("$", "").replace("{", "").replace("}", "");
                     if (map.containsKey(cellTextKey)) {
@@ -556,7 +555,7 @@ public class WordReporter {
                 tmpCell = tmpCells.get(k);
                 XWPFTableCell cell = cells.get(k);
                 cellText = tmpCell.getText();
-                if (!StringUtils.isNullOrEmpty(cellText)) {
+                if (!StringUtil.isEmpty(cellText)) {
                     //转换为mapkey对应的字段
                     cellTextKey = cellText.replace("$", "").replace("{", "").replace("}", "");
                     if (map.containsKey(cellTextKey)) {

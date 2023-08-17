@@ -7,6 +7,7 @@ import com.easydatabaseexport.database.kingbase.impl.KingBaseDataV8ResultImpl;
 import com.easydatabaseexport.database.mysql.impl.MySqlDataResultImpl;
 import com.easydatabaseexport.database.oracle.impl.OracleDataResultImpl;
 import com.easydatabaseexport.database.postgresql.impl.PostgreSqlDataResultImpl;
+import com.easydatabaseexport.database.sqlite.impl.SqliteDataResultImpl;
 import com.easydatabaseexport.database.sqlserver.impl.SqlServerDataResultImpl;
 import com.easydatabaseexport.database.xugu.impl.XuguDataResultImpl;
 import com.easydatabaseexport.enums.DataBaseType;
@@ -32,6 +33,7 @@ public class DataBaseFactory {
         REPORT_POOL.put(DataBaseType.MYSQL.name(), new MySqlDataResultImpl());
         REPORT_POOL.put(DataBaseType.ORACLE.name(), new OracleDataResultImpl());
         REPORT_POOL.put(DataBaseType.SQLSERVER.name(), new SqlServerDataResultImpl());
+        REPORT_POOL.put(DataBaseType.SQLITE.name(), new SqliteDataResultImpl());
         REPORT_POOL.put(DataBaseType.POSTGRESQL.name(), new PostgreSqlDataResultImpl());
         REPORT_POOL.put(DataBaseType.DB2.name(), new Db2DataResultImpl());
         REPORT_POOL.put(DataBaseType.DM.name(), new DmDataResultImpl());

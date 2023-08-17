@@ -34,11 +34,11 @@ public class NavicatCipherFactory {
      */
     @SneakyThrows
     public static NavicatCipher get(String type) {
-        NavicatCipher chiper = REPORT_POOL.get(type);
-        if (chiper == null) {
+        NavicatCipher cipher = REPORT_POOL.get(type);
+        if (cipher == null) {
             throw new ClassNotFoundException("no NavicatCipher was found");
         } else {
-            return chiper;
+            return cipher;
         }
     }
 }

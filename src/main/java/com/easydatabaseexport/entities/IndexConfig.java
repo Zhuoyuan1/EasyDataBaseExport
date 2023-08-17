@@ -18,6 +18,7 @@ public class IndexConfig {
     private String dataType;
     private String passwd;
     private String group;
+    private boolean isSqlite;
 
     public IndexConfig(String url, String database, String user, String dataType, String passwd, String group) {
         this.url = url;
@@ -26,6 +27,16 @@ public class IndexConfig {
         this.user = user;
         this.passwd = passwd;
         this.group = group;
+    }
+
+    public IndexConfig(String url, String database, String user, String dataType, String passwd, String group, boolean isSqlite) {
+        this.url = url;
+        this.database = database;
+        this.dataType = dataType;
+        this.user = user;
+        this.passwd = passwd;
+        this.group = group;
+        this.isSqlite = isSqlite;
     }
 
     @Override
@@ -37,7 +48,7 @@ public class IndexConfig {
         if (StringUtil.isNotEmpty(group)) {
             return group + "/" + url + "|" + database + "|" + user + "|" + dataType;
         }
-        if (StringUtil.isNotEmpty(dataType)) {
+        if (StringUtil.isNotEmpty(dataType) || isSqlite) {
             return url + "|" + database + "|" + user + "|" + dataType;
         }
         return url + "|" + database + "|" + user;

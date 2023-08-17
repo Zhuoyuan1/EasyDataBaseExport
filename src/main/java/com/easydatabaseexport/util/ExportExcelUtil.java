@@ -3,7 +3,7 @@ package com.easydatabaseexport.util;
 import com.easydatabaseexport.common.PatternConstant;
 import com.easydatabaseexport.log.LogManager;
 import lombok.SneakyThrows;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
  * @author lzy
  * @date 2021/2/28 17:44
  **/
-@Log
+@Log4j
 public class ExportExcelUtil<T> {
 
     private static final String regex = "(\\*|/|:|\\\\|\\?)";

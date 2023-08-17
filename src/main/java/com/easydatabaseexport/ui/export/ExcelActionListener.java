@@ -8,7 +8,7 @@ import com.easydatabaseexport.ui.component.JCheckBoxTree;
 import com.easydatabaseexport.ui.export.config.ExportFileType;
 import com.easydatabaseexport.util.ExportExcelUtil;
 import lombok.SneakyThrows;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -20,7 +20,7 @@ import java.io.FileOutputStream;
  * @author lzy
  * @date 2022/11/10 9:33
  **/
-@Log
+@Log4j
 public class ExcelActionListener extends AbstractActionListener implements ActionListener {
 
 

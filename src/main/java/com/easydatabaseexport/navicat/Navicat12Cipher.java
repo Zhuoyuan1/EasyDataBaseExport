@@ -1,7 +1,7 @@
 package com.easydatabaseexport.navicat;
 
 import com.easydatabaseexport.log.LogManager;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets;
  * @author lzy
  * @date 2021/01/14 15:58
  */
-@Log
+@Log4j
 public class Navicat12Cipher extends NavicatCipher {
     private static final SecretKeySpec _AesKey;
     private static final IvParameterSpec _AesIV;

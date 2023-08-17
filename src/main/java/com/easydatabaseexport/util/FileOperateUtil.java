@@ -2,8 +2,10 @@ package com.easydatabaseexport.util;
 
 import com.easydatabaseexport.EasyDataBaseExportMain;
 import com.easydatabaseexport.entities.OSDetector;
+import com.easydatabaseexport.enums.ConfigKeyEnum;
 import com.easydatabaseexport.log.LogManager;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.log4j.Logger;
 import org.apache.poi.util.IOUtils;
 import org.ini4j.Config;
 import org.ini4j.Ini;
@@ -23,7 +25,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
-import java.util.logging.Logger;
 
 /**
  * FileOperateUtil
@@ -143,7 +144,7 @@ public class FileOperateUtil {
         }
         if ("".equals(msg) || null == msg) return;
         //写数据
-        writeData(path, "sys", "", msg);
+        writeData(path, ConfigKeyEnum.SYS.getKey(), "", msg);
     }
 
     /**
@@ -159,7 +160,7 @@ public class FileOperateUtil {
      **/
     public static void writeData(String address, String keyword, String childKey, String msg) {
         try {
-            if ("sys".equals(keyword)) {
+            if (ConfigKeyEnum.SYS.getKey().equals(keyword)) {
                 Config cfg = FileIniRead.getDefaultConfig();
                 // 生成配置文件的URL
                 File iniFile = new File(address);
@@ -272,18 +273,11 @@ public class FileOperateUtil {
                 bufferedReader.close();
                 in.close();
             } else {
-                log.info("请求失败！");
+                log.error("请求失败！");
             }
         } catch (Exception e) {
             LogManager.writeLogFile(e, log);
         }
         return retStr.toString();
     }
-
-    /*public static void main(String[] args) {
-        writeData("E:\\MySQLTools-main\\src\\main\\resources\\database.ini", "sys", "1111=1");
-        writeData("E:\\MySQLTools-main\\src\\main\\resources\\database.ini", "theme", "1");
-        writeData("E:\\MySQLTools-main\\src\\main\\resources\\database.ini", "theme", "2");
-        System.out.println(getLocalMd5File("C:\\Users\\Administrator\\Desktop\\MySQLToWordOrExcel\\target\\EasyDataBaseExport-0.0.1-SNAPSHOT-jar-with-dependencies.jar"));
-    }*/
 }

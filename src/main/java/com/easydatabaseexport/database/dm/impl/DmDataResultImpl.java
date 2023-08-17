@@ -13,9 +13,8 @@ import com.easydatabaseexport.entities.TableTypeForMode;
 import com.easydatabaseexport.log.LogManager;
 import com.easydatabaseexport.util.HtmlUtils;
 import com.easydatabaseexport.util.StringUtil;
-import com.mysql.cj.util.StringUtils;
 import lombok.SneakyThrows;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -45,7 +44,7 @@ import java.util.stream.Collectors;
  * @author lzy
  * @date 2022/7/21 10:37
  **/
-@Log
+@Log4j
 public class DmDataResultImpl extends AbstractDataResultImpl implements DataResult {
 
     @Override
@@ -224,7 +223,7 @@ public class DmDataResultImpl extends AbstractDataResultImpl implements DataResu
             Statement stmt = CommonConstant.connection.createStatement();
             //执行查询所有数据库操作
             ResultSet rs = null;
-            if (StringUtils.isNullOrEmpty(CommonConstant.DATABASE_NAME)) {
+            if (StringUtil.isEmpty(CommonConstant.DATABASE_NAME)) {
                 rs = stmt.executeQuery("SELECT DISTINCT object_name FROM ALL_OBJECTS WHERE OBJECT_TYPE = 'SCH' ");
             } else {
                 rs = stmt.executeQuery("SELECT DISTINCT object_name FROM ALL_OBJECTS WHERE OBJECT_TYPE = 'SCH' AND object_name = '" + CommonConstant.DATABASE_NAME + "'");

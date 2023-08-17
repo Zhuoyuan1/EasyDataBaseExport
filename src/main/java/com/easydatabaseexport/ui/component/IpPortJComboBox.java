@@ -48,7 +48,7 @@ public class IpPortJComboBox extends JComboBox<IndexConfig> {
         if (!isAction) {
             str2.insert(index, c);
         }
-        if ("".equals(str.toString())) {
+        if ("".contentEquals(str)) {
             recoverModel();
         } else {
             setItems(getMatchKey(str2.toString()));

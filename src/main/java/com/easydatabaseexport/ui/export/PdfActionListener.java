@@ -92,7 +92,7 @@ public class PdfActionListener extends AbstractActionListener implements ActionL
                 document.add(tableParagraph);
                 //索引Table
                 if (indexMap.size() > 0) {
-                    Table table = new Table(CommonConstant.INDEX_HEAD_NAMES.length);
+                    Table table = new Table(CommonConstant.INDEX_HEAD_NAMES.length == 0 ? 1 : CommonConstant.INDEX_HEAD_NAMES.length);
                     process(table, CommonConstant.INDEX_HEAD_NAMES, font, true);
                     String name = parameterMap.getKey().split("\\[")[0];
                     List<IndexInfoVO> indexInfoVOList = indexMap.get(name);
@@ -108,7 +108,7 @@ public class PdfActionListener extends AbstractActionListener implements ActionL
                 document.add(new Paragraph());
                 //字段Table
                 List<TableParameter> exportList = parameterMap.getValue();
-                Table table = new Table(CommonConstant.COLUMN_HEAD_NAMES.length);
+                Table table = new Table(CommonConstant.COLUMN_HEAD_NAMES.length == 0 ? 1 : CommonConstant.COLUMN_HEAD_NAMES.length);
                 //标题、内容
                 process(table, CommonConstant.COLUMN_HEAD_NAMES, font, true);
                 for (TableParameter tableParameter : exportList) {

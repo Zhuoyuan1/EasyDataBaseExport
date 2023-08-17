@@ -1,7 +1,7 @@
 package com.easydatabaseexport.util;
 
 import com.easydatabaseexport.log.LogManager;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 
 import java.lang.reflect.Method;
 
@@ -11,7 +11,7 @@ import java.lang.reflect.Method;
  * @author lzy
  * @date 2021/5/31 11:45
  **/
-@Log
+@Log4j
 public class OpenUrl {
 
     public static void openURL(String url) {

@@ -3,8 +3,11 @@ package com.easydatabaseexport.factory.assembly;
 import com.easydatabaseexport.core.DataResult;
 
 import javax.swing.ImageIcon;
+import javax.swing.JPopupMenu;
+import javax.swing.JTree;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * DataBaseAssemblyList 装配清单
@@ -33,4 +36,11 @@ public interface DataBaseAssembly {
      * @return DataResult
      **/
     DataResult dataResult();
+
+    /**
+     * 获取右键菜单列表
+     *
+     * @return List<JPopupMenu>
+     **/
+    Map<String, JPopupMenu> getMenuList(JTree jtree);
 }

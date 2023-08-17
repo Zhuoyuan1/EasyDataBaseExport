@@ -6,6 +6,7 @@ import com.easydatabaseexport.core.DataResult;
 import com.easydatabaseexport.entities.ErrorMsg;
 import com.easydatabaseexport.entities.TableType;
 import com.easydatabaseexport.factory.DataBaseAssemblyFactory;
+import com.easydatabaseexport.factory.assembly.DataBaseAssembly;
 import com.easydatabaseexport.factory.assembly.impl.ConDatabaseModeTableImpl;
 import com.easydatabaseexport.log.LogManager;
 import com.easydatabaseexport.ui.component.CustomMenu;
@@ -21,9 +22,9 @@ import com.easydatabaseexport.util.FileIniRead;
 import com.easydatabaseexport.util.FileOperateUtil;
 import com.easydatabaseexport.util.StringUtil;
 import com.easydatabaseexport.util.SwingUtils;
-import javafx.util.Pair;
 import lombok.SneakyThrows;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
+import org.apache.commons.math3.util.Pair;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -48,12 +49,14 @@ import java.util.Map;
  * @author lzy
  * @date 2021/11/1 15:06
  **/
-@Log
+@Log4j
 public class ConnectJavaFrame {
 
     private final DataResult dataResult;
 
     public static JCheckBoxTree.CheckNode cacheRootNode = null;
+
+    private static final JPopupMenu right = new JPopupMenu();
 
     public ConnectJavaFrame() {
         this.dataResult = DataBaseAssemblyFactory.get(CommonConstant.DATA_BASE_TYPE).dataResult();
@@ -105,14 +108,6 @@ public class ConnectJavaFrame {
         }
         CommonConstant.root = new JCheckBoxTree(rootNode);
 
-        //添加监听事件
-        CommonConstant.root.addMouseListener(new MouseAdapter() {
-            @SneakyThrows
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                addClickListener(e, CommonConstant.root);
-            }
-        });
         // 创建一个水平方向的分割面板
         final JSplitPane hSplitPane = new JSplitPane();
         // 分隔条左侧的宽度为300像素
@@ -138,11 +133,7 @@ public class ConnectJavaFrame {
             String text = search.getText().trim();
             cacheRootNode = new JCheckBoxTree.CheckNode(CommonConstant.ROOT);
             if (StringUtil.isEmpty(text)) {
-                treeJSplit.setBottomComponent(new JScrollPane(CommonConstant.root, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED));
-                cacheRootNode.removeAllChildren();
-                treeJSplit.validate();
-                treeJSplit.repaint();
+                clearSearch(treeJSplit, cacheRootNode);
                 return;
             }
             Pair<JCheckBoxTree, JCheckBoxTree.CheckNode> result = JCheckBoxTree.searchTree(rootNode, text);
@@ -163,17 +154,30 @@ public class ConnectJavaFrame {
             search.setText("");
             MyAction.isSearch = true;
             treeJSplit.remove(searchJPanel);
-            treeJSplit.validate();
-            treeJSplit.repaint();
+            clearSearch(treeJSplit, cacheRootNode);
         });
         //快捷键ctrl+f搜索功能
         InputMap imap = treeJSplit.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap map = treeJSplit.getActionMap();
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_MASK),
                 "find str");
-        map.put("find str", new MyAction(searchJPanel, treeJSplit));
+        map.put("find str", new MyAction(searchJPanel, treeJSplit, search));
         treeJSplit.setBottomComponent(rootJs);
         hSplitPane.setLeftComponent(treeJSplit);
+        //右键菜单
+        right.add(new JMenuItem("导出所选到Excel")).addActionListener(new ExcelActionListener(rootNode));
+        right.add(new JMenuItem("导出所选到Word")).addActionListener(new WordSuperActionListener(rootNode));
+        right.add(new JMenuItem("导出所选到Markdown")).addActionListener(new MarkdownActionListener(rootNode));
+        right.add(new JMenuItem("导出所选到Html")).addActionListener(new HtmlActionListener(rootNode));
+        right.add(new JMenuItem("导出所选到Pdf")).addActionListener(new PdfActionListener(rootNode));
+        //添加监听事件
+        CommonConstant.root.addMouseListener(new MouseAdapter() {
+            //@SneakyThrows
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                addClickListener(e, CommonConstant.root);
+            }
+        });
         JPanel panel = new JPanel(new BorderLayout());
         CommonConstant.RIGHT.setBorder(new TitledBorder("详细信息"));
         panel.add(CommonConstant.RIGHT, BorderLayout.CENTER);
@@ -270,61 +274,89 @@ public class ConnectJavaFrame {
         CheckUpdateUtil.check();
     }
 
+    protected static void clearSearch(JSplitPane tree, JCheckBoxTree.CheckNode cacheRootNode) {
+        tree.setBottomComponent(new JScrollPane(CommonConstant.root, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+        if (null != cacheRootNode) {
+            cacheRootNode.removeAllChildren();
+        }
+        tree.validate();
+        tree.repaint();
+    }
+
     static class MyAction extends AbstractAction {
         private final JPanel jPanel;
         private final JSplitPane treeJSplit;
+        private final JTextField search;
         public static boolean isSearch = true;
 
-        public MyAction(JPanel jPanel, JSplitPane treeJSplit) {
+        public MyAction(JPanel jPanel, JSplitPane treeJSplit, JTextField search) {
             this.jPanel = jPanel;
             this.treeJSplit = treeJSplit;
+            this.search = search;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             if (isSearch) {
                 treeJSplit.setTopComponent(jPanel);
-                treeJSplit.validate();
-                treeJSplit.repaint();
                 isSearch = false;
             } else {
                 treeJSplit.remove(jPanel);
-                treeJSplit.validate();
-                treeJSplit.repaint();
                 isSearch = true;
             }
+            search.setText("");
+            clearSearch(treeJSplit, cacheRootNode);
         }
     }
 
-    @SneakyThrows
+    //@SneakyThrows
     private void addClickListener(MouseEvent e, JCheckBoxTree tree) {
-        DefaultMutableTreeNode selectionNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-        if (e.getClickCount() > 0 && selectionNode != null) {
-            DefaultMutableTreeNode parent = (DefaultMutableTreeNode) selectionNode.getParent();
-            int index = selectionNode.getUserObject().toString().lastIndexOf("[");
-            if (index <= 0) {
-                return;
-            }
-            CommonConstant.TABLE_NAME = selectionNode.getUserObject().toString().substring(0, index);
-            CommonConstant.DATABASE_NAME = parent.getUserObject().toString();
-            if (DataBaseAssemblyFactory.get(CommonConstant.DATA_BASE_TYPE) instanceof ConDatabaseModeTableImpl) {
-                DefaultMutableTreeNode dataBaseNode = (DefaultMutableTreeNode) parent.getParent();
-                CommonConstant.TREE_DATABASE = dataBaseNode.getUserObject().toString();
-            }
-            if (!parent.getUserObject().toString().equals(tree.getModel().getRoot().toString())) {
-                //先查数据库，保证 库、表、字段没被删除
-                Map<String, ErrorMsg> map = dataResult.checkExist(CommonConstant.TABLE_NAME, CommonConstant.DATABASE_NAME);
-                if (map.containsKey(CommonConstant.FAIL)) {
-                    ErrorMsg msg = map.get(CommonConstant.FAIL);
-                    JOptionPane.showMessageDialog(null, msg.getMessage(), msg.getTitle(), msg.getMessageType());
+        try {
+            int x = e.getX();
+            int y = e.getY();
+            JCheckBoxTree.CheckNode selectionNode = (JCheckBoxTree.CheckNode) tree.getLastSelectedPathComponent();
+            if (null == selectionNode) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    right.show(CommonConstant.root, e.getX(), e.getY());
                     return;
                 }
-                if (e.getClickCount() == 1) {
-                    dataResult.doListValueChanged();
-                } else if (e.getClickCount() == 2) {
-                    dataResult.doListDataValueChanged();
+            }
+            if (e.getClickCount() > 0 && selectionNode != null) {
+                DefaultMutableTreeNode parent = selectionNode.getParent();
+                DataBaseAssembly dataBaseAssembly = DataBaseAssemblyFactory.get(CommonConstant.DATA_BASE_TYPE);
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    Map<String, JPopupMenu> map = dataBaseAssembly.getMenuList(tree);
+                    map.get(selectionNode.getType()).show(tree, x, y);
+                } else {
+                    int index = selectionNode.getUserObject().toString().lastIndexOf("[");
+                    if (index <= 0) {
+                        return;
+                    }
+                    CommonConstant.TABLE_NAME = selectionNode.getUserObject().toString().substring(0, index);
+                    CommonConstant.DATABASE_NAME = parent.getUserObject().toString();
+                    if (dataBaseAssembly instanceof ConDatabaseModeTableImpl) {
+                        DefaultMutableTreeNode dataBaseNode = (DefaultMutableTreeNode) parent.getParent();
+                        CommonConstant.TREE_DATABASE = dataBaseNode.getUserObject().toString();
+                    }
+                    if (!parent.getUserObject().toString().equals(tree.getModel().getRoot().toString())) {
+                        //先查数据库，保证 库、表、字段没被删除
+                        Map<String, ErrorMsg> map = dataResult.checkExist(CommonConstant.TABLE_NAME, CommonConstant.DATABASE_NAME);
+                        if (map.containsKey(CommonConstant.FAIL)) {
+                            ErrorMsg msg = map.get(CommonConstant.FAIL);
+                            JOptionPane.showMessageDialog(null, msg.getMessage(), msg.getTitle(), msg.getMessageType());
+                            return;
+                        }
+                        if (e.getClickCount() == 1) {
+                            dataResult.doListValueChanged();
+                        } else if (e.getClickCount() == 2) {
+                            dataResult.doListDataValueChanged();
+                        }
+                    }
                 }
             }
+        } catch (Exception exception) {
+            exception.printStackTrace();
         }
     }
 

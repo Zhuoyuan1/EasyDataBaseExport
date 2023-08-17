@@ -1,7 +1,7 @@
 package com.easydatabaseexport.navicat;
 
 import com.easydatabaseexport.log.LogManager;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -16,7 +16,7 @@ import java.util.Arrays;
  * @author lzy
  * @date 2021/01/14 15:58
  */
-@Log
+@Log4j
 public class Navicat11Cipher extends NavicatCipher {
     public static final String DefaultUserKey = "3DC5CA39";
     private static byte[] _IV;
@@ -156,9 +156,7 @@ public class Navicat11Cipher extends NavicatCipher {
                 byte[] temp = Arrays.copyOfRange(inData, blocks_len * 8, (blocks_len * 8) + left_len);
 
                 xorBytes(temp, CV, left_len);
-                for (int j = 0; j < temp.length; j++) {
-                    ret[blocks_len * 8 + j] = temp[j];
-                }
+                System.arraycopy(temp, 0, ret, blocks_len * 8 + 0, temp.length);
             }
 
             return ret;

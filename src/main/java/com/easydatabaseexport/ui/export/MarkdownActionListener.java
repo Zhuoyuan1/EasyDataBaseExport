@@ -37,7 +37,7 @@ public class MarkdownActionListener extends AbstractActionListener implements Ac
     public boolean export(File markdownFile) {
         Map<String, List<Map.Entry<String, List<TableParameter>>>> allMap = listMap.entrySet()
                 .stream().collect(Collectors.groupingBy(v -> v.getKey().split("---")[0]));
-        try (BufferedWriter fileWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(markdownFile, true), StandardCharsets.UTF_8.name()))) {
+        try (BufferedWriter fileWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(markdownFile, true), StandardCharsets.UTF_8))) {
             for (Map.Entry<String, List<Map.Entry<String, List<TableParameter>>>> myMap : allMap.entrySet()) {
                 //数据库名
                 String database = myMap.getKey();
