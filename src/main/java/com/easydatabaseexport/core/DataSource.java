@@ -2,6 +2,7 @@ package com.easydatabaseexport.core;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.easydatabaseexport.log.LogManager;
+import lombok.Getter;
 import lombok.extern.log4j.Log4j;
 
 import java.sql.Connection;
@@ -17,12 +18,14 @@ import java.sql.Statement;
  * @date 2021/10/25 18:20
  **/
 @Log4j
+@Getter
 public abstract class DataSource {
 
     private final String driver;
     private String url;
     private String username;
     private String passwd;
+    private DruidDataSource dataSource;
 
     protected DataSource(String driver, String url, String username, String passwd) {
         this.driver = driver;
@@ -40,13 +43,15 @@ public abstract class DataSource {
         this.url = url;
         this.username = username;
         this.passwd = passwd;
-        DruidDataSource dataSource = new DruidDataSource();
+        dataSource = new DruidDataSource();
         dataSource.setUrl(url);
         dataSource.setDriverClassName(driver);
         dataSource.setUsername(username);
         dataSource.setPassword(passwd);
         dataSource.setFilters("com.easydatabaseexport.log.ExecuteSqlFilter");
         dataSource.setTestWhileIdle(false);
+        //请求失败之后，中断连接
+        dataSource.setBreakAfterAcquireFailure(true);
         dataSource.setFailFast(true);
         return dataSource.getConnection();
     }

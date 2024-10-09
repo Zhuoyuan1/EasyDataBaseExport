@@ -98,9 +98,9 @@ public class XuguDataResultImpl extends AbstractDataResultImpl implements DataRe
         CommonConstant.tableParameterList.clear();
         String sql = "select distinct col_name,type_name,'',SCALE,NOT_NULL,DEF_VAL,COMMENTS,A.COL_NO" +
                 " FROM SYS_COLUMNS A  WHERE table_id=(select table_id " +
-                "from SYS_tables where  table_name ='?'and schema_id in (select schema_id from SYS_schemas where schema_name ='?')) " +
+                "from SYS_tables where  table_name ='%s'and schema_id in (select schema_id from SYS_schemas where schema_name ='%s')) " +
                 "ORDER BY COL_NO";
-        String newSql = String.format(sql.replace("?", "%s"), CommonConstant.TABLE_NAME, CommonConstant.DATABASE_NAME);
+        String newSql = String.format(sql, CommonConstant.TABLE_NAME, CommonConstant.DATABASE_NAME);
         ResultSet rs = getResultSetBySql(newSql);
 
         try {
@@ -136,9 +136,9 @@ public class XuguDataResultImpl extends AbstractDataResultImpl implements DataRe
         List<TableParameter> tableParameterList = new ArrayList<>();
         String sql = "select distinct col_name,type_name,'',SCALE,NOT_NULL,DEF_VAL,COMMENTS, A.COL_NO" +
                 " FROM SYS_COLUMNS A  WHERE table_id=(select table_id " +
-                "from SYS_tables where  table_name ='?'and schema_id in (select schema_id from SYS_schemas where schema_name ='?')) " +
+                "from SYS_tables where  table_name ='%s'and schema_id in (select schema_id from SYS_schemas where schema_name ='%s')) " +
                 "ORDER BY COL_NO";
-        String newSql = String.format(sql.replace("?", "%s"), tableName, databaseName);
+        String newSql = String.format(sql, tableName, databaseName);
         ResultSet rs = getResultSetBySql(newSql);
         try {
             //rs相当于一个指针一样---指向了返回的结果集的第一行之前,而在之前已经遍历过到最后了，所以现在需要返回到原先的位置
@@ -257,35 +257,10 @@ public class XuguDataResultImpl extends AbstractDataResultImpl implements DataRe
     public List<String> getAllDataBaseName() {
         List<String> nameList = new LinkedList<String>();
         try {
-            Statement stmt = CommonConstant.connection.createStatement();
-            //执行查询所有数据库操作
-            ResultSet rs = null;
-
-            rs = stmt.executeQuery("SELECT S.SCHEMA_NAME FROM ALL_SCHEMAS S,ALL_USERS U WHERE S.USER_ID=U.USER_ID AND S.DB_ID=1 ORDER BY S.SCHEMA_ID ASC");
-
-            //处理表名
-            while (rs.next()) {
-                nameList.add(rs.getString(1));
-            }
-            //处理拼接in中的参数
-            StringBuilder stringBuilder = new StringBuilder();
-            for (int i = 0; i < nameList.size(); i++) {
-                if (i == nameList.size() - 1) {
-                    stringBuilder.append(nameList.get(i));
-                } else {
-                    stringBuilder.append(nameList.get(i)).append(",");
-                }
-            }
             //postgresql 库 -> 模式 -> 表
             //根据所有模式 去查表
-            if ("".equals(CommonConstant.DATABASE_NAME)) {
-                getTableInfoByMode(stringBuilder.toString());
-            } else {
-                nameList.clear();
-                nameList.add(CommonConstant.DATABASE_NAME);
-                getTableInfoByMode(CommonConstant.DATABASE_NAME);
-            }
-
+            nameList.add(CommonConstant.DATABASE_NAME);
+            getTableInfoByMode(CommonConstant.DATABASE_NAME);
         } catch (Exception e) {
             LogManager.writeLogFile(e, log);
         }
@@ -293,22 +268,18 @@ public class XuguDataResultImpl extends AbstractDataResultImpl implements DataRe
     }
 
     private void getTableInfoByMode(String modes) throws SQLException {
-        String sql = "SELECT S.SCHEMA_NAME tableSchema FROM ALL_SCHEMAS S,ALL_USERS U WHERE S.USER_ID=U.USER_ID AND S.DB_ID=1 ORDER BY S.SCHEMA_ID ASC";
-        String[] str = modes.split(",");
-        //首先执行选库操作
-        for (int i = 0; i < str.length; i++) {
-            //执行sql
-            List<TableType> list = super.toList(new TableType(), sql);
-            if (!list.isEmpty()) {
-                int finalI = i;
-                list.forEach(v -> {
-                    try {
-                        getTableInfoAndStructure(v.getTableSchema(), str[finalI]);
-                    } catch (SQLException e) {
-                        LogManager.writeLogFile(e, log);
-                    }
-                });
-            }
+        String sql = "SELECT S.SCHEMA_NAME tableSchema FROM ALL_SCHEMAS S,ALL_USERS U WHERE S.USER_ID=U.USER_ID " +
+                "AND S.DB_ID in (select DB_ID from ALL_DATABASES where DB_NAME = '%s') ORDER BY S.SCHEMA_ID ASC";
+        //执行sql
+        List<TableType> list = super.toList(new TableType(), String.format(sql, modes));
+        if (!list.isEmpty()) {
+            list.forEach(v -> {
+                try {
+                    getTableInfoAndStructure(v.getTableSchema(), modes);
+                } catch (SQLException e) {
+                    LogManager.writeLogFile(e, log);
+                }
+            });
         }
     }
 
@@ -343,8 +314,8 @@ public class XuguDataResultImpl extends AbstractDataResultImpl implements DataRe
     @Override
     public List<IndexInfoVO> getIndexByKeyForMode(String dataBase, String tableName, String catalog) {
         String sql = "select distinct tab.TABLE_NAME,idx.KEYS,idx.INDEX_NAME,idx.INDEX_TYPE,idx.IS_UNIQUE,idx.IS_PRIMARY,'' from SYS_indexes idx left join SYS_tables tab on tab.table_id=idx.table_id " +
-                "left join SYS_schemas sch on tab.schema_id=sch.schema_id where sch.schema_name='?' and tab.table_name='?'";
-        String newSql = String.format(sql.replace("?", "%s"), dataBase, tableName);
+                "left join SYS_schemas sch on tab.schema_id=sch.schema_id where sch.schema_name='%s' and tab.table_name='%s'";
+        String newSql = String.format(sql, dataBase, tableName);
         List<IndexInfo> indexList = new ArrayList<>();
         List<IndexInfoVO> voList = new ArrayList<>();
         ResultSet rs = getResultSetBySql(newSql);
@@ -395,8 +366,8 @@ public class XuguDataResultImpl extends AbstractDataResultImpl implements DataRe
 
     public void getTableInfoAndStructure(String name, String tableCatalog) throws SQLException {
         String sql = "select distinct t.TABLE_NAME,'',s.DB_ID,t.CREATE_TIME,t.COMMENTS,s.SCHEMA_NAME from SYS_tables t,SYS_schemas s " +
-                "where s.schema_id = t.schema_id and s.DB_ID = 1 and s.schema_name='?' order by t.TABLE_NAME ";
-        String newSql = String.format(sql.replace("?", "%s"), name);
+                "where s.schema_id = t.schema_id and s.DB_ID in (select DB_ID from ALL_DATABASES where DB_NAME = '%s') and s.schema_name='%s' order by t.TABLE_NAME ";
+        String newSql = String.format(sql, tableCatalog, name);
         ResultSet rs = getResultSetBySql(newSql);
 
         List<TableType> list = new ArrayList<>();
@@ -441,9 +412,9 @@ public class XuguDataResultImpl extends AbstractDataResultImpl implements DataRe
      **/
     @Override
     public String getTableInfoAndStructureByClick(String tableName, String dataBase) throws SQLException {
-        String sql = "SELECT t.TABLE_NAME,s.SCHEMA_NAME,t.COMMENTS from SYS_tables t,SYS_schemas s  where s.schema_id = t.schema_id and s.DB_ID = 1 " +
-                "and s.schema_name='?' and t.table_name ='?' order by t.TABLE_NAME ";
-        String newSql = String.format(sql.replace("?", "%s"), dataBase, tableName);
+        String sql = "SELECT t.TABLE_NAME,s.SCHEMA_NAME,t.COMMENTS from SYS_tables t,SYS_schemas s  where s.schema_id = t.schema_id " +
+                "and s.schema_name='%s?' and t.table_name ='%s' order by t.TABLE_NAME ";
+        String newSql = String.format(sql, dataBase, tableName);
         ResultSet rs = getResultSetBySql(newSql);
 
         try {

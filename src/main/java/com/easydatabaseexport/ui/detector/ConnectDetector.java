@@ -106,13 +106,14 @@ public class ConnectDetector {
                     .orElse(throwable).getMessage()).setTitle("错误").setMessageType(JOptionPane.ERROR_MESSAGE);
             LogManager.writeLogFile(throwable, log);
             map.put(CommonConstant.FAIL, msg);
-            return map;
         } finally {
             //测试连接需要释放资源
-            if (!confirm) {
+            if (!confirm || map.containsKey(CommonConstant.FAIL)) {
                 dataSource.close(CommonConstant.connection);
+                dataSource.getDataSource().close();
             }
         }
+        return map;
     }
 
     /**

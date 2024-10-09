@@ -5,11 +5,7 @@ import com.easydatabaseexport.enums.DataBaseType;
 import com.easydatabaseexport.enums.NavicatVerEnum;
 import com.easydatabaseexport.log.LogManager;
 import com.easydatabaseexport.ui.component.LinkLabel;
-import com.easydatabaseexport.util.AESCoder;
-import com.easydatabaseexport.util.DecodeNcx;
-import com.easydatabaseexport.util.FileIniRead;
-import com.easydatabaseexport.util.FileOperateUtil;
-import com.easydatabaseexport.util.SwingUtils;
+import com.easydatabaseexport.util.*;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.codec.binary.Base64;
 import org.w3c.dom.Document;
@@ -189,11 +185,11 @@ public class UploadSynFrame {
                 String msg = "";
                 if (DataBaseType.SQLITE.name().equalsIgnoreCase(resultMap.get("ConnType"))) {
                     msg = resultMap.get("ConnectionName") + "/" + resultMap.get("DatabaseFileName").replaceAll(":", "|")
-                            + "|" + resultMap.get("Database") + "|" + resultMap.get("UserName") + "|" + resultMap.get("ConnType") + " = "
+                            + "|" + StringUtil.stringNullForEmpty(resultMap.get("Database")) + "|" + resultMap.get("UserName") + "|" + resultMap.get("ConnType") + " = "
                             + password;
                 } else {
                     msg = resultMap.get("ConnectionName") + "/" + resultMap.get("Host") + "|" + resultMap.get("Port")
-                            + "|" + resultMap.get("Database") + "|" + resultMap.get("UserName") + "|" + resultMap.get("ConnType") + " = "
+                            + "|" + StringUtil.stringNullForEmpty(resultMap.get("Database")) + "|" + resultMap.get("UserName") + "|" + resultMap.get("ConnType") + " = "
                             + password;
                 }
                 FileOperateUtil.writeData(FileOperateUtil.getSavePath()
