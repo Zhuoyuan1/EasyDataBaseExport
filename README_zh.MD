@@ -25,7 +25,7 @@
 
 ### 📖 使用手册
 
-[《EasyDataBaseExport说明文档》](https://www.likethewind.top/)
+[《EasyDataBaseExport说明文档》](https://zhuoyuan1.github.io/)
 
 ### 💬 运行环境要求
 
