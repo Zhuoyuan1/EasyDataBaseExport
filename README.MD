@@ -24,7 +24,7 @@ Download address: [here](https://www.likethewind.top/)
 Other versions: [download](https://wwr.lanzoui.com/b02c7c0cb) 【password:1111】
 
 ### 📖 Documentation   
-[《Documentation of EasyDataBaseExport》](https://www.likethewind.top/)
+[《Documentation of EasyDataBaseExport》](https://zhuoyuan1.github.io/)
 
 ### 💬  Runtime environment requirements
 
